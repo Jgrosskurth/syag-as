@@ -48,12 +48,30 @@ function decorateButtons(main) {
   });
 }
 
+/**
+ * Assigns IDs to sections based on the block they contain,
+ * enabling anchor navigation (e.g. #roster, #schedule).
+ */
+function decorateSectionIds(main) {
+  main.querySelectorAll('.section').forEach((section) => {
+    if (section.id) return;
+    const block = section.querySelector('[class][data-block-name]');
+    if (block) {
+      const name = block.dataset.blockName;
+      if (name && !main.querySelector(`#${name}`)) {
+        section.id = name;
+      }
+    }
+  });
+}
+
 export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
   decorateButtons(main);
+  decorateSectionIds(main);
 }
 
 async function loadEager(doc) {

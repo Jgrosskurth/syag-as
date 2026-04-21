@@ -24,11 +24,17 @@ export default async function decorate(block) {
   wrapper.append(nav);
   block.append(wrapper);
 
-  // Tab click handling
+  // Tab click handling with smooth scroll
   wrapper.querySelectorAll('.nav-tab').forEach((tab) => {
     tab.addEventListener('click', (e) => {
+      e.preventDefault();
       wrapper.querySelectorAll('.nav-tab').forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
+      const targetId = tab.getAttribute('href').substring(1);
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
   });
 }
