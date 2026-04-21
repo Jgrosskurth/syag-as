@@ -1,0 +1,71 @@
+.stats { overflow-x: auto; }
+
+.stats .stats-note {
+  font-size: 13px;
+  color: var(--gray-600);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+.stats .stats-table-wrap {
+  background: var(--white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.stats .stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.stats .stats-table th {
+  font-family: var(--heading-font-family);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--green-dark);
+  padding: 14px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.stats .stats-table th:first-child { text-align: left; padding-left: 20px; }
+.stats .stats-table th.sortable { cursor: pointer; }
+.stats .stats-table th.sortable:hover { color: var(--gold-light); }
+
+.stats .stats-table td {
+  padding: 12px 14px;
+  font-size: 14px;
+  text-align: center;
+  border-bottom: 1px solid var(--gray-200);
+  font-variant-numeric: tabular-nums;
+}
+
+.stats .stats-table td.player-col {
+  text-align: left;
+  padding-left: 20px;
+  font-weight: 600;
+  color: var(--green-dark);
+  white-space: nowrap;
+}
+
+.stats .stats-table .pos-label {
+  color: var(--gray-600);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.stats .stats-table .highlight { color: var(--gold-dark); font-weight: 700; }
+.stats .stats-table .avg-col { font-weight: 600; }
+
+.stats .stats-table .totals-row {
+  background: var(--cream);
+  font-weight: 700;
+  border-top: 3px solid var(--gold);
+}
+
+.stats .stats-table tbody tr:hover { background: var(--cream); }

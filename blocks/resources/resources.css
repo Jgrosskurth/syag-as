@@ -1,0 +1,50 @@
+.resources .resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.resources .resource-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 28px 24px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s, box-shadow 0.25s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  border-left: 4px solid var(--gold);
+}
+
+.resources .resource-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.resources .resource-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.resources .resource-title {
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--green-dark);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.resources .resource-desc {
+  font-size: 13px;
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+.resources .resource-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold-dark);
+}

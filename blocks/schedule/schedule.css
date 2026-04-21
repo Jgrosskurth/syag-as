@@ -1,0 +1,84 @@
+.schedule {
+  overflow-x: auto;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--body-font-size-s);
+}
+
+.schedule-table th {
+  background: var(--as-green);
+  color: var(--as-gold);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: var(--body-font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.schedule-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0ddd5;
+  vertical-align: middle;
+}
+
+.schedule-table tbody tr:hover {
+  background: rgb(26 71 42 / 5%);
+}
+
+.schedule-table .sched-date {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.schedule-table .sched-opponent {
+  font-weight: 500;
+}
+
+.schedule-table .sched-location {
+  color: var(--as-gray);
+  font-size: var(--body-font-size-xs);
+}
+
+.schedule-table .sched-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.schedule-table .sched-badge.home {
+  background: var(--as-green);
+  color: var(--as-white);
+}
+
+.schedule-table .sched-badge.away {
+  background: var(--as-gold);
+  color: var(--as-green-dark);
+}
+
+.schedule-table .sched-badge.bye {
+  background: #e0ddd5;
+  color: var(--as-gray);
+}
+
+.schedule-table .sched-result.win {
+  color: var(--as-green);
+  font-weight: 700;
+}
+
+.schedule-table .sched-result.loss {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+@media (width < 600px) {
+  .schedule-table { font-size: var(--body-font-size-xs); }
+  .schedule-table th, .schedule-table td { padding: 8px 10px; }
+}

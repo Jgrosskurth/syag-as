@@ -1,0 +1,23 @@
+footer {
+  background: var(--as-green-dark);
+  color: var(--as-cream);
+  text-align: center;
+  padding: 32px 24px;
+  margin-top: 48px;
+}
+
+footer .footer-team {
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-m);
+  font-weight: 700;
+  color: var(--as-gold);
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+footer .footer-info {
+  margin: 0;
+  font-size: var(--body-font-size-s);
+  color: rgb(255 255 255 / 60%);
+}

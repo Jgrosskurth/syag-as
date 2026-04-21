@@ -1,0 +1,107 @@
+/* stylelint-disable no-descending-specificity */
+header .nav-wrapper {
+  background: linear-gradient(135deg, var(--green-darker) 0%, var(--green) 50%, var(--green-dark) 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgb(0 30 15 / 30%);
+}
+
+header .header-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px 24px 8px;
+}
+
+header .team-logo {
+  width: 64px;
+  height: 64px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--heading-font-family);
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--green-darker);
+  border: 3px solid var(--gold-light);
+  flex-shrink: 0;
+}
+
+header .team-info { text-align: left; }
+
+header .team-name {
+  font-family: var(--heading-font-family);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--gold);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+header .team-subtitle {
+  font-size: 13px;
+  color: rgb(255 255 255 / 60%);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+header .team-record {
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--gold);
+  background: rgb(255 255 255 / 8%);
+  padding: 4px 14px;
+  border-radius: 6px;
+  border: 1px solid rgb(200 164 21 / 30%);
+  letter-spacing: 1px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+header .nav-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  padding: 0 16px;
+}
+
+header .nav-tab {
+  font-family: var(--heading-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 50%);
+  text-decoration: none;
+  padding: 14px 20px;
+  position: relative;
+  transition: color 0.3s;
+}
+
+header .nav-tab:hover { color: rgb(255 255 255 / 80%); }
+
+header .nav-tab.active { color: var(--gold); }
+
+header .nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 3px 3px 0 0;
+}
+
+@media (width < 640px) {
+  header .team-name { font-size: 22px; letter-spacing: 2px; }
+  header .team-logo { width: 50px; height: 50px; font-size: 26px; }
+  header .nav-tab { padding: 12px 12px; font-size: 12px; letter-spacing: 1px; }
+}

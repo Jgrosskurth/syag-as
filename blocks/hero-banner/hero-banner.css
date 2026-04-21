@@ -1,0 +1,42 @@
+.hero-banner-wrapper {
+  background: linear-gradient(135deg, var(--as-green-dark) 0%, var(--as-green) 50%, var(--as-green-light) 100%);
+  padding: 0;
+}
+
+.hero-banner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--as-white);
+}
+
+.hero-banner h1 {
+  font-size: 48px;
+  color: var(--as-white);
+  margin: 0 0 8px;
+  letter-spacing: 0.08em;
+}
+
+.hero-banner h2 {
+  font-size: 18px;
+  color: var(--as-gold);
+  margin: 0 0 16px;
+  font-family: var(--body-font-family);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+}
+
+.hero-banner p {
+  margin: 0;
+  color: var(--as-gold-light);
+}
+
+.hero-banner .button {
+  margin-top: 16px;
+}
+
+@media (width < 600px) {
+  .hero-banner h1 { font-size: 32px; }
+  .hero-banner { padding: 32px 16px; }
+}
