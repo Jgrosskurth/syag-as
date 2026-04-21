@@ -29,7 +29,6 @@ async function loadFonts() {
 
 function buildAutoBlocks(main) {
   try {
-    buildHeroBanner(main);
     buildHeroBlock(main);
   } catch (error) { /* skip */ }
 }
@@ -75,27 +74,6 @@ function decorateSectionIds(main) {
   });
 }
 
-/**
- * Builds a hero banner section with team info and CTA.
- */
-function buildHeroBanner(main) {
-  // Only add if there's no hero-banner block already
-  if (main.querySelector('.hero-banner')) return;
-  const section = document.createElement('div');
-  section.innerHTML = `
-    <div class="hero-banner">
-      <div>
-        <div>
-          <h1>The A's</h1>
-          <h2>2026 SYAG Baseball &middot; 10U</h2>
-          <p>Record: 1 - 0</p>
-          <p><strong><a href="https://web.gc.com/teams/ytegAXE9ZttI/2026-spring-906-grosskurth-a-s/schedule">Follow on GameChanger</a></strong></p>
-        </div>
-      </div>
-    </div>
-  `;
-  main.prepend(section);
-}
 
 export function decorateMain(main) {
   decorateIcons(main);
