@@ -1,25 +1,49 @@
-const STATS_DATA = [
-  { name: "Conor Wilkens", pos: "CF", ab: 3, r: 1, h: 2, rbi: 1, bb: 0, so: 1 },
-  { name: "Sean Fox", pos: "P", ab: 2, r: 0, h: 0, rbi: 1, bb: 1, so: 2 },
-  { name: "Matthew Grosskurth", pos: "3B", ab: 2, r: 2, h: 1, rbi: 1, bb: 1, so: 0 },
-  { name: "CJ Solomon", pos: "SS", ab: 2, r: 3, h: 2, rbi: 2, bb: 1, so: 0 },
-  { name: "Christian Cestare", pos: "C", ab: 3, r: 0, h: 0, rbi: 0, bb: 0, so: 3 },
-  { name: "Joshua Saponieri", pos: "LF", ab: 0, r: 1, h: 0, rbi: 0, bb: 2, so: 0 },
-  { name: "Landon McKillop", pos: "2B", ab: 1, r: 0, h: 1, rbi: 1, bb: 1, so: 0 },
-  { name: "Connor Daly", pos: "1B", ab: 1, r: 0, h: 0, rbi: 1, bb: 1, so: 1 },
-  { name: "Nicky Capozzoli", pos: "RF", ab: 2, r: 1, h: 1, rbi: 0, bb: 0, so: 1 },
-  { name: "Brogan Schaefer", pos: "", ab: 0, r: 2, h: 0, rbi: 0, bb: 1, so: 0 },
-  { name: "Stevie Kull", pos: "", ab: 1, r: 1, h: 0, rbi: 1, bb: 1, so: 0 },
-  { name: "Connor Philbin", pos: "", ab: 1, r: 1, h: 0, rbi: 1, bb: 1, so: 1 },
-  { name: "Salvatore Giordano", pos: "", ab: 1, r: 0, h: 0, rbi: 1, bb: 1, so: 1 },
+const FALLBACK_DATA = [
+  { Player: 'Conor Wilkens', Pos: 'CF', AB: 3, R: 1, H: 2, RBI: 1, BB: 0, SO: 1 },
+  { Player: 'Sean Fox', Pos: 'P', AB: 2, R: 0, H: 0, RBI: 1, BB: 1, SO: 2 },
+  { Player: 'Matthew Grosskurth', Pos: '3B', AB: 2, R: 2, H: 1, RBI: 1, BB: 1, SO: 0 },
+  { Player: 'CJ Solomon', Pos: 'SS', AB: 2, R: 3, H: 2, RBI: 2, BB: 1, SO: 0 },
+  { Player: 'Christian Cestare', Pos: 'C', AB: 3, R: 0, H: 0, RBI: 0, BB: 0, SO: 3 },
+  { Player: 'Joshua Saponieri', Pos: 'LF', AB: 0, R: 1, H: 0, RBI: 0, BB: 2, SO: 0 },
+  { Player: 'Landon McKillop', Pos: '2B', AB: 1, R: 0, H: 1, RBI: 1, BB: 1, SO: 0 },
+  { Player: 'Connor Daly', Pos: '1B', AB: 1, R: 0, H: 0, RBI: 1, BB: 1, SO: 1 },
+  { Player: 'Nicky Capozzoli', Pos: 'RF', AB: 2, R: 1, H: 1, RBI: 0, BB: 0, SO: 1 },
+  { Player: 'Brogan Schaefer', Pos: '', AB: 0, R: 2, H: 0, RBI: 0, BB: 1, SO: 0 },
+  { Player: 'Stevie Kull', Pos: '', AB: 1, R: 1, H: 0, RBI: 1, BB: 1, SO: 0 },
+  { Player: 'Connor Philbin', Pos: '', AB: 1, R: 1, H: 0, RBI: 1, BB: 1, SO: 1 },
+  { Player: 'Salvatore Giordano', Pos: '', AB: 1, R: 0, H: 0, RBI: 1, BB: 1, SO: 1 },
 ];
+
+const STAT_COLS = ['AB', 'R', 'H', 'RBI', 'BB', 'SO', 'AVG'];
 
 function calcAvg(h, ab) {
   if (ab === 0) return '.---';
   return (h / ab).toFixed(3).replace(/^0/, '');
 }
 
-export default function decorate(block) {
+async function fetchStats() {
+  try {
+    const resp = await fetch('/stats.json');
+    if (!resp.ok) throw new Error(resp.status);
+    const json = await resp.json();
+    const rows = json.data || json;
+    if (!Array.isArray(rows) || rows.length === 0) throw new Error('empty');
+    return rows.map((r) => ({
+      Player: r.Player || r.player || r.Name || r.name || '',
+      Pos: r.Pos || r.pos || r.Position || r.position || '',
+      AB: Number(r.AB || r.ab || 0),
+      R: Number(r.R || r.r || 0),
+      H: Number(r.H || r.h || 0),
+      RBI: Number(r.RBI || r.rbi || 0),
+      BB: Number(r.BB || r.bb || 0),
+      SO: Number(r.SO || r.so || 0),
+    }));
+  } catch {
+    return FALLBACK_DATA;
+  }
+}
+
+export default async function decorate(block) {
   block.textContent = '';
 
   const note = document.createElement('p');
@@ -32,14 +56,13 @@ export default function decorate(block) {
   const table = document.createElement('table');
   table.className = 'stats-table';
 
-  const cols = ['Player', 'AB', 'R', 'H', 'RBI', 'BB', 'SO', 'AVG'];
+  const cols = ['Player', ...STAT_COLS];
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
   cols.forEach((col, i) => {
     const th = document.createElement('th');
     th.textContent = col;
     if (i > 0) {
-      th.dataset.col = i;
       th.className = 'sortable';
       th.addEventListener('click', () => sortBy(i));
     }
@@ -53,17 +76,19 @@ export default function decorate(block) {
   wrap.append(table);
   block.append(note, wrap);
 
-  let sortCol = 7;
+  const statsData = await fetchStats();
+
+  let sortCol = 7; // AVG
   let sortAsc = false;
 
   function render() {
-    const sorted = [...STATS_DATA].sort((a, b) => {
-      const keys = [null, 'ab', 'r', 'h', 'rbi', 'bb', 'so'];
+    const sorted = [...statsData].sort((a, b) => {
+      const keys = [null, 'AB', 'R', 'H', 'RBI', 'BB', 'SO'];
       let va;
       let vb;
       if (sortCol === 7) {
-        va = a.ab === 0 ? -1 : a.h / a.ab;
-        vb = b.ab === 0 ? -1 : b.h / b.ab;
+        va = a.AB === 0 ? -1 : a.H / a.AB;
+        vb = b.AB === 0 ? -1 : b.H / b.AB;
       } else {
         va = a[keys[sortCol]];
         vb = b[keys[sortCol]];
@@ -73,34 +98,34 @@ export default function decorate(block) {
 
     tbody.innerHTML = '';
     sorted.forEach((p) => {
-      const avg = calcAvg(p.h, p.ab);
-      const posLabel = p.pos ? ` <span class="pos-label">(${p.pos})</span>` : '';
+      const avg = calcAvg(p.H, p.AB);
+      const posLabel = p.Pos ? ` <span class="pos-label">(${p.Pos})</span>` : '';
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td class="player-col">${p.name}${posLabel}</td>
-        <td>${p.ab}</td>
-        <td>${p.r}</td>
-        <td class="${p.h > 0 ? 'highlight' : ''}">${p.h}</td>
-        <td class="${p.rbi > 0 ? 'highlight' : ''}">${p.rbi}</td>
-        <td>${p.bb}</td>
-        <td>${p.so}</td>
+        <td class="player-col">${p.Player}${posLabel}</td>
+        <td>${p.AB}</td>
+        <td>${p.R}</td>
+        <td class="${p.H > 0 ? 'highlight' : ''}">${p.H}</td>
+        <td class="${p.RBI > 0 ? 'highlight' : ''}">${p.RBI}</td>
+        <td>${p.BB}</td>
+        <td>${p.SO}</td>
         <td class="avg-col">${avg}</td>
       `;
       tbody.append(tr);
     });
 
-    const totals = STATS_DATA.reduce((acc, p) => {
-      acc.ab += p.ab; acc.r += p.r; acc.h += p.h;
-      acc.rbi += p.rbi; acc.bb += p.bb; acc.so += p.so;
+    const totals = statsData.reduce((acc, p) => {
+      acc.AB += p.AB; acc.R += p.R; acc.H += p.H;
+      acc.RBI += p.RBI; acc.BB += p.BB; acc.SO += p.SO;
       return acc;
-    }, { ab: 0, r: 0, h: 0, rbi: 0, bb: 0, so: 0 });
+    }, { AB: 0, R: 0, H: 0, RBI: 0, BB: 0, SO: 0 });
     const tr = document.createElement('tr');
     tr.className = 'totals-row';
     tr.innerHTML = `
       <td class="player-col">Team Totals</td>
-      <td>${totals.ab}</td><td>${totals.r}</td><td>${totals.h}</td>
-      <td>${totals.rbi}</td><td>${totals.bb}</td><td>${totals.so}</td>
-      <td class="avg-col">${calcAvg(totals.h, totals.ab)}</td>
+      <td>${totals.AB}</td><td>${totals.R}</td><td>${totals.H}</td>
+      <td>${totals.RBI}</td><td>${totals.BB}</td><td>${totals.SO}</td>
+      <td class="avg-col">${calcAvg(totals.H, totals.AB)}</td>
     `;
     tbody.append(tr);
   }
