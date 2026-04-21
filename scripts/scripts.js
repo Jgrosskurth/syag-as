@@ -28,7 +28,10 @@ async function loadFonts() {
 }
 
 function buildAutoBlocks(main) {
-  try { buildHeroBlock(main); } catch (error) { /* skip */ }
+  try {
+    buildHeroBanner(main);
+    buildHeroBlock(main);
+  } catch (error) { /* skip */ }
 }
 
 function decorateButtons(main) {
@@ -53,16 +56,45 @@ function decorateButtons(main) {
  * enabling anchor navigation (e.g. #roster, #schedule).
  */
 function decorateSectionIds(main) {
+  const usedIds = new Set();
   main.querySelectorAll('.section').forEach((section) => {
-    if (section.id) return;
-    const block = section.querySelector('[class][data-block-name]');
+    if (section.id) { usedIds.add(section.id); return; }
+    const block = section.querySelector('[data-block-name]');
     if (block) {
       const name = block.dataset.blockName;
-      if (name && !main.querySelector(`#${name}`)) {
+      if (name && !usedIds.has(name)) {
+        // Remove conflicting heading IDs so section gets the anchor
+        const conflicting = section.querySelector(`#${name}`);
+        if (conflicting && conflicting.tagName.match(/^H[1-6]$/)) {
+          conflicting.removeAttribute('id');
+        }
         section.id = name;
+        usedIds.add(name);
       }
     }
   });
+}
+
+/**
+ * Builds a hero banner section with team info and CTA.
+ */
+function buildHeroBanner(main) {
+  // Only add if there's no hero-banner block already
+  if (main.querySelector('.hero-banner')) return;
+  const section = document.createElement('div');
+  section.innerHTML = `
+    <div class="hero-banner">
+      <div>
+        <div>
+          <h1>The A's</h1>
+          <h2>2026 SYAG Baseball &middot; 10U</h2>
+          <p>Record: 1 - 0</p>
+          <p><strong><a href="https://web.gc.com/teams/ytegAXE9ZttI/2026-spring-906-grosskurth-a-s/schedule">Follow on GameChanger</a></strong></p>
+        </div>
+      </div>
+    </div>
+  `;
+  main.prepend(section);
 }
 
 export function decorateMain(main) {
