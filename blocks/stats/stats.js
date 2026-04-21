@@ -19,32 +19,9 @@ function calcAvg(h, ab) {
   return (h / ab).toFixed(3).replace(/^0/, '');
 }
 
-function loadGCScript() {
-  return new Promise((resolve, reject) => {
-    if (window.GC) { resolve(); return; }
-    const script = document.createElement('script');
-    script.src = 'https://widgets.gc.com/static/js/sdk.v1.js';
-    script.onload = resolve;
-    script.onerror = reject;
-    document.body.append(script);
-  });
-}
-
-export default async function decorate(block) {
+export default function decorate(block) {
   block.textContent = '';
 
-  // Live Scores widget
-  const liveSection = document.createElement('div');
-  liveSection.className = 'stats-live-scores';
-  const liveTitle = document.createElement('h3');
-  liveTitle.textContent = 'Live Scores';
-  liveSection.append(liveTitle);
-  const liveTarget = document.createElement('div');
-  liveTarget.id = 'gc-schedule-widget-fbk6';
-  liveSection.append(liveTarget);
-  block.append(liveSection);
-
-  // Batting stats table
   const note = document.createElement('p');
   note.className = 'stats-note';
   note.textContent = 'Click any column header to sort. Stats from GameChanger.';
@@ -135,16 +112,4 @@ export default async function decorate(block) {
   }
 
   render();
-
-  // Load GC live scores widget
-  try {
-    await loadGCScript();
-    window.GC.team.schedule.init({
-      target: '#gc-schedule-widget-fbk6',
-      widgetId: '836257c4-d374-455e-9783-4ddb13ec6087',
-      maxVerticalGamesVisible: 4,
-    });
-  } catch (e) {
-    liveTarget.textContent = 'Unable to load live scores. Visit GameChanger for the latest.';
-  }
 }
