@@ -21,7 +21,122 @@ function calcAvg(h, ab) {
   return (h / ab).toFixed(3).replace(/^0/, '');
 }
 
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"' && text[i + 1] === '"') { field += '"'; i += 1; }
+      else if (ch === '"') inQuotes = false;
+      else field += ch;
+    } else if (ch === '"') { inQuotes = true; }
+    else if (ch === ',') { row.push(field.trim()); field = ''; }
+    else if (ch === '\n' || (ch === '\r' && text[i + 1] === '\n')) {
+      row.push(field.trim()); field = '';
+      if (row.some((c) => c !== '')) rows.push(row);
+      row = [];
+      if (ch === '\r') i += 1;
+    } else { field += ch; }
+  }
+  if (field || row.length) { row.push(field.trim()); if (row.some((c) => c !== '')) rows.push(row); }
+  return rows;
+}
+
+function parseGameChangerCSV(text) {
+  const rows = parseCSV(text);
+  if (rows.length < 3) return null;
+
+  // Row 0 = category headers (Batting/Pitching/Fielding), Row 1 = column names
+  const catRow = rows[0];
+  const headers = rows[1];
+
+  // Find where batting columns end (before Pitching)
+  let battingEnd = headers.length;
+  for (let i = 0; i < catRow.length; i += 1) {
+    if (catRow[i] === 'Pitching') { battingEnd = i; break; }
+  }
+
+  // Build column index map for batting section
+  const colIdx = {};
+  for (let i = 0; i < battingEnd; i += 1) {
+    if (headers[i] && !colIdx[headers[i]]) colIdx[headers[i]] = i;
+  }
+
+  const get = (row, name) => (colIdx[name] !== undefined ? row[colIdx[name]] || '' : '');
+  const getNum = (row, name) => {
+    const v = get(row, name);
+    if (v === '' || v === '-' || v === 'N/A') return 0;
+    const n = Number(v);
+    return Number.isNaN(n) ? 0 : n;
+  };
+
+  const players = [];
+  for (let i = 2; i < rows.length; i += 1) {
+    const row = rows[i];
+    const num = get(row, 'Number');
+    const first = get(row, 'First');
+    const last = get(row, 'Last');
+    if (num === 'Totals' || num === 'Glossary' || (!first && !last)) continue;
+    players.push({
+      Player: `${first} ${last}`.trim(),
+      Pos: '',
+      AB: getNum(row, 'AB'),
+      R: getNum(row, 'R'),
+      H: getNum(row, 'H'),
+      RBI: getNum(row, 'RBI'),
+      BB: getNum(row, 'BB'),
+      SO: getNum(row, 'SO'),
+    });
+  }
+  return players.length > 0 ? players : null;
+}
+
+function parseSimpleCSV(text) {
+  const rows = parseCSV(text);
+  if (rows.length < 2) return null;
+  const headers = rows[0];
+  const find = (...names) => headers.findIndex((h) => names.includes(h));
+  const playerIdx = find('Player', 'player', 'Name', 'name');
+  const abIdx = find('AB', 'ab');
+  if (playerIdx < 0 || abIdx < 0) return null;
+
+  const posIdx = find('Pos', 'pos', 'Position');
+  const rIdx = find('R', 'r');
+  const hIdx = find('H', 'h');
+  const rbiIdx = find('RBI', 'rbi');
+  const bbIdx = find('BB', 'bb');
+  const soIdx = find('SO', 'so');
+  const col = (row, idx) => (idx >= 0 ? Number(row[idx]) || 0 : 0);
+
+  return rows.slice(1)
+    .filter((r) => r[playerIdx] && r[playerIdx] !== 'Totals')
+    .map((r) => ({
+      Player: r[playerIdx] || '',
+      Pos: posIdx >= 0 ? r[posIdx] || '' : '',
+      AB: col(r, abIdx), R: col(r, rIdx), H: col(r, hIdx),
+      RBI: col(r, rbiIdx), BB: col(r, bbIdx), SO: col(r, soIdx),
+    }));
+}
+
 async function fetchStats() {
+  // Try CSV first (GameChanger export or simple format)
+  try {
+    const resp = await fetch('/stats.csv');
+    if (resp.ok) {
+      const text = await resp.text();
+      if (text && !text.startsWith('<?xml') && !text.startsWith('<!DOCTYPE')) {
+        const gc = parseGameChangerCSV(text);
+        if (gc) return gc;
+        const simple = parseSimpleCSV(text);
+        if (simple) return simple;
+      }
+    }
+  } catch { /* fall through */ }
+
+  // Try JSON (xlsx uploaded to DA)
   try {
     const resp = await fetch('/stats.json');
     if (!resp.ok) throw new Error(resp.status);
@@ -38,9 +153,9 @@ async function fetchStats() {
       BB: Number(r.BB || r.bb || 0),
       SO: Number(r.SO || r.so || 0),
     }));
-  } catch {
-    return FALLBACK_DATA;
-  }
+  } catch { /* fall through */ }
+
+  return FALLBACK_DATA;
 }
 
 function buildCards(container, sorted) {
