@@ -1,3 +1,18 @@
+const GC_TEAM_API = 'https://api.team-manager.gc.com/public/teams/ytegAXE9ZttI';
+
+async function fetchRecord() {
+  try {
+    const resp = await fetch(GC_TEAM_API);
+    if (!resp.ok) throw new Error(resp.status);
+    const data = await resp.json();
+    const { win, loss, tie } = data.team_season?.record || {};
+    if (win !== undefined && loss !== undefined) {
+      return tie > 0 ? `${win} - ${loss} - ${tie}` : `${win} - ${loss}`;
+    }
+  } catch { /* fall through */ }
+  return null;
+}
+
 export default async function decorate(block) {
   block.textContent = '';
 
@@ -8,7 +23,7 @@ export default async function decorate(block) {
       <div class="team-info">
         <div class="team-name">The A's</div>
         <div class="team-subtitle">2026 SYAG Baseball</div>
-        <div class="team-record">1 - 0</div>
+        <div class="team-record">...</div>
       </div>
     </div>
     <div class="nav-tabs">
@@ -23,6 +38,15 @@ export default async function decorate(block) {
   wrapper.className = 'nav-wrapper';
   wrapper.append(nav);
   block.append(wrapper);
+
+  // Fetch live record from GameChanger
+  const record = await fetchRecord();
+  const recordEl = wrapper.querySelector('.team-record');
+  if (record) {
+    recordEl.textContent = record;
+  } else {
+    recordEl.textContent = '';
+  }
 
   // Tab click handling with smooth scroll
   wrapper.querySelectorAll('.nav-tab').forEach((tab) => {
