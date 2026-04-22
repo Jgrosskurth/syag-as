@@ -1,16 +1,18 @@
-const GC_TEAM_API = 'https://api.team-manager.gc.com/public/teams/ytegAXE9ZttI';
-
-async function fetchRecord() {
-  try {
-    const resp = await fetch(GC_TEAM_API);
-    if (!resp.ok) throw new Error(resp.status);
-    const data = await resp.json();
-    const { win, loss, tie } = data.team_season?.record || {};
-    if (win !== undefined && loss !== undefined) {
-      return tie > 0 ? `${win} - ${loss} - ${tie}` : `${win} - ${loss}`;
-    }
-  } catch { /* fall through */ }
-  return null;
+function computeRecord() {
+  // Count W/L/T from schedule block results on the page
+  const schedule = document.querySelector('.schedule');
+  if (!schedule) return null;
+  let win = 0;
+  let loss = 0;
+  let tie = 0;
+  schedule.querySelectorAll('.sched-result').forEach((el) => {
+    const text = el.textContent.trim();
+    if (text.startsWith('W')) win += 1;
+    else if (text.startsWith('L')) loss += 1;
+    else if (text.startsWith('T')) tie += 1;
+  });
+  if (win === 0 && loss === 0 && tie === 0) return null;
+  return tie > 0 ? `${win} - ${loss} - ${tie}` : `${win} - ${loss}`;
 }
 
 export default async function decorate(block) {
@@ -23,7 +25,7 @@ export default async function decorate(block) {
       <div class="team-info">
         <div class="team-name">The A's</div>
         <div class="team-subtitle">2026 SYAG Baseball</div>
-        <div class="team-record">...</div>
+        <div class="team-record"></div>
       </div>
     </div>
     <div class="nav-tabs">
@@ -39,14 +41,20 @@ export default async function decorate(block) {
   wrapper.append(nav);
   block.append(wrapper);
 
-  // Fetch live record from GameChanger
-  const record = await fetchRecord();
+  // Update record once schedule block loads
   const recordEl = wrapper.querySelector('.team-record');
-  if (record) {
-    recordEl.textContent = record;
-  } else {
-    recordEl.textContent = '';
-  }
+  const updateRecord = () => {
+    const record = computeRecord();
+    if (record) recordEl.textContent = record;
+  };
+
+  // Check periodically until schedule renders (lazy-loaded)
+  let attempts = 0;
+  const check = setInterval(() => {
+    updateRecord();
+    attempts += 1;
+    if (recordEl.textContent || attempts > 20) clearInterval(check);
+  }, 500);
 
   // Tab click handling with smooth scroll
   wrapper.querySelectorAll('.nav-tab').forEach((tab) => {
