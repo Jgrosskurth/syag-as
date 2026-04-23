@@ -3,7 +3,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .recaps .recaps-filter-btn {
@@ -32,11 +32,11 @@
   color: var(--white);
 }
 
-/* ===== Recap cards ===== */
+/* ===== Recap articles ===== */
 .recaps .recaps-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 32px;
 }
 
 .recaps .recap-card {
@@ -44,97 +44,79 @@
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  padding: 32px;
 }
 
+/* ===== Article header ===== */
 .recaps .recap-header {
-  background: var(--green-dark);
-  color: var(--white);
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--gray-200);
 }
 
-.recaps .recap-game-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.recaps .recap-title {
+  font-family: var(--body-font-family);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--gray-800);
+  margin: 0 0 8px;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
-.recaps .recap-game-num {
+.recaps .recap-subtitle {
+  font-size: 14px;
+  color: var(--gray-600);
+  margin: 0 0 12px;
+  font-style: italic;
+}
+
+.recaps .recap-badge {
+  display: inline-block;
   font-family: var(--heading-font-family);
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--gold);
+  padding: 4px 14px;
+  border-radius: 4px;
 }
 
-.recaps .recap-date {
-  font-size: 13px;
-  color: rgb(255 255 255 / 60%);
+.recaps .recap-badge.win {
+  background: var(--green);
+  color: var(--white);
 }
 
-.recaps .recap-matchup {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.recaps .recap-badge.loss {
+  background: #c0392b;
+  color: var(--white);
 }
 
-.recaps .recap-opponent {
-  font-size: 14px;
-  font-weight: 500;
+.recaps .recap-badge.tie {
+  background: var(--gray-600);
+  color: var(--white);
 }
 
-.recaps .recap-result {
-  font-family: var(--heading-font-family);
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  padding: 3px 12px;
-  border-radius: 6px;
-}
-
-.recaps .recap-result.win {
-  background: rgb(255 255 255 / 15%);
-  color: var(--gold);
-}
-
-.recaps .recap-result.loss {
-  background: rgb(192 57 43 / 30%);
-  color: #f5a0a0;
-}
-
+/* ===== Article body ===== */
 .recaps .recap-body {
-  padding: 20px;
-  font-size: 15px;
-  line-height: 1.7;
+  font-size: 16px;
+  line-height: 1.8;
   color: var(--gray-800);
 }
 
 .recaps .recap-body p {
-  margin: 0 0 12px;
+  margin: 0 0 16px;
 }
 
 .recaps .recap-body p:last-child {
   margin-bottom: 0;
 }
 
+/* ===== Responsive ===== */
 @media (width < 600px) {
-  .recaps .recap-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .recaps .recap-body {
-    padding: 16px;
-    font-size: 14px;
-  }
-
-  .recaps .recaps-filter-btn {
-    font-size: 11px;
-    padding: 5px 12px;
-  }
+  .recaps .recap-card { padding: 20px; }
+  .recaps .recap-title { font-size: 22px; }
+  .recaps .recap-body { font-size: 15px; line-height: 1.7; }
+  .recaps .recaps-filter-btn { font-size: 11px; padding: 5px 12px; }
 }

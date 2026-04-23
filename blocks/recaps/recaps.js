@@ -1,6 +1,5 @@
 function parseHeading(text) {
   // Format: "Game 1 — W 12-1 vs 905 Tedeschi Reds — Sat, Apr 18"
-  // Use em-dash (—) or en-dash (–) as delimiters (NOT regular hyphen which appears in team names)
   const parts = text.split(/\s*[—–]\s*/);
   if (parts.length < 3) return null;
 
@@ -14,9 +13,21 @@ function parseHeading(text) {
     game: Number(gameMatch[1]),
     resultClass: resultMatch[1].toUpperCase() === 'W' ? 'win' : resultMatch[1].toUpperCase() === 'L' ? 'loss' : 'tie',
     result: `${resultMatch[1].toUpperCase()} ${resultMatch[2]}`,
+    score: resultMatch[2],
+    wl: resultMatch[1].toUpperCase(),
     opponent: resultMatch[3].trim(),
     date: parts[2].trim(),
   };
+}
+
+function buildTitle(info) {
+  if (info.wl === 'W') {
+    return `A's Take Down ${info.opponent} ${info.score}`;
+  }
+  if (info.wl === 'L') {
+    return `A's With Tough Game Against ${info.opponent}`;
+  }
+  return `A's Tie ${info.opponent} ${info.score}`;
 }
 
 async function fetchRecaps() {
@@ -35,7 +46,8 @@ async function fetchRecaps() {
       if (!info) return;
 
       const paragraphs = [...section.querySelectorAll('p')];
-      info.summary = paragraphs.map((p) => `<p>${p.innerHTML}</p>`).join('');
+      info.body = paragraphs.map((p) => `<p>${p.innerHTML}</p>`).join('');
+      info.title = buildTitle(info);
       recaps.push(info);
     });
 
@@ -71,27 +83,22 @@ export default async function decorate(block) {
     filterBar.append(btn);
   });
 
-  // Recap cards
+  // Recap articles
   const cardList = document.createElement('div');
   cardList.className = 'recaps-list';
 
   recaps.forEach((r) => {
-    const card = document.createElement('div');
+    const card = document.createElement('article');
     card.className = 'recap-card';
     card.dataset.game = r.game;
 
     card.innerHTML = `
       <div class="recap-header">
-        <div class="recap-game-info">
-          <span class="recap-game-num">Game ${r.game}</span>
-          <span class="recap-date">${r.date}</span>
-        </div>
-        <div class="recap-matchup">
-          <span class="recap-opponent">vs ${r.opponent}</span>
-          <span class="recap-result ${r.resultClass}">${r.result}</span>
-        </div>
+        <h3 class="recap-title">${r.title}</h3>
+        <p class="recap-subtitle">${r.date} vs. ${r.opponent}</p>
+        <span class="recap-badge ${r.resultClass}">${r.result}</span>
       </div>
-      <div class="recap-body">${r.summary}</div>
+      <div class="recap-body">${r.body}</div>
     `;
     cardList.append(card);
   });
