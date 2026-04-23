@@ -1,20 +1,20 @@
 const FALLBACK_DATA = [
-  { Player: 'Conor Wilkens', Pos: 'CF', AB: 3, R: 1, H: 2, RBI: 1, BB: 0, SO: 1 },
-  { Player: 'Sean Fox', Pos: 'P', AB: 2, R: 0, H: 0, RBI: 1, BB: 1, SO: 2 },
-  { Player: 'Matthew Grosskurth', Pos: '3B', AB: 2, R: 2, H: 1, RBI: 1, BB: 1, SO: 0 },
-  { Player: 'CJ Solomon', Pos: 'SS', AB: 2, R: 3, H: 2, RBI: 2, BB: 1, SO: 0 },
-  { Player: 'Christian Cestare', Pos: 'C', AB: 3, R: 0, H: 0, RBI: 0, BB: 0, SO: 3 },
-  { Player: 'Joshua Saponieri', Pos: 'LF', AB: 0, R: 1, H: 0, RBI: 0, BB: 2, SO: 0 },
-  { Player: 'Landon McKillop', Pos: '2B', AB: 1, R: 0, H: 1, RBI: 1, BB: 1, SO: 0 },
-  { Player: 'Connor Daly', Pos: '1B', AB: 1, R: 0, H: 0, RBI: 1, BB: 1, SO: 1 },
-  { Player: 'Nicky Capozzoli', Pos: 'RF', AB: 2, R: 1, H: 1, RBI: 0, BB: 0, SO: 1 },
-  { Player: 'Brogan Schaefer', Pos: '', AB: 0, R: 2, H: 0, RBI: 0, BB: 1, SO: 0 },
-  { Player: 'Stevie Kull', Pos: '', AB: 1, R: 1, H: 0, RBI: 1, BB: 1, SO: 0 },
-  { Player: 'Connor Philbin', Pos: '', AB: 1, R: 1, H: 0, RBI: 1, BB: 1, SO: 1 },
-  { Player: 'Salvatore Giordano', Pos: '', AB: 1, R: 0, H: 0, RBI: 1, BB: 1, SO: 1 },
+  { Player: 'Conor Wilkens', Pos: 'CF', AB: 3, R: 1, H: 2, '2B': 0, '3B': 0, HR: 0, RBI: 1, BB: 0, SO: 1 },
+  { Player: 'Sean Fox', Pos: 'P', AB: 2, R: 0, H: 0, '2B': 0, '3B': 0, HR: 0, RBI: 1, BB: 1, SO: 2 },
+  { Player: 'Matthew Grosskurth', Pos: '3B', AB: 2, R: 2, H: 1, '2B': 0, '3B': 0, HR: 0, RBI: 1, BB: 1, SO: 0 },
+  { Player: 'CJ Solomon', Pos: 'SS', AB: 2, R: 3, H: 2, '2B': 0, '3B': 0, HR: 1, RBI: 2, BB: 1, SO: 0 },
+  { Player: 'Christian Cestare', Pos: 'C', AB: 3, R: 0, H: 0, '2B': 0, '3B': 0, HR: 0, RBI: 0, BB: 0, SO: 3 },
+  { Player: 'Joshua Saponieri', Pos: 'LF', AB: 0, R: 1, H: 0, '2B': 0, '3B': 0, HR: 0, RBI: 0, BB: 2, SO: 0 },
+  { Player: 'Landon McKillop', Pos: '2B', AB: 1, R: 0, H: 1, '2B': 0, '3B': 0, HR: 0, RBI: 1, BB: 1, SO: 0 },
+  { Player: 'Connor Daly', Pos: '1B', AB: 1, R: 0, H: 0, '2B': 0, '3B': 0, HR: 0, RBI: 1, BB: 1, SO: 1 },
+  { Player: 'Nicky Capozzoli', Pos: 'RF', AB: 2, R: 1, H: 1, '2B': 0, '3B': 0, HR: 0, RBI: 0, BB: 0, SO: 1 },
+  { Player: 'Brogan Schaefer', Pos: '', AB: 0, R: 2, H: 0, '2B': 0, '3B': 0, HR: 0, RBI: 0, BB: 1, SO: 0 },
+  { Player: 'Stevie Kull', Pos: '', AB: 1, R: 1, H: 0, '2B': 0, '3B': 0, HR: 0, RBI: 1, BB: 1, SO: 0 },
+  { Player: 'Connor Philbin', Pos: '', AB: 1, R: 1, H: 0, '2B': 0, '3B': 0, HR: 0, RBI: 1, BB: 1, SO: 1 },
+  { Player: 'Salvatore Giordano', Pos: '', AB: 1, R: 0, H: 0, '2B': 0, '3B': 0, HR: 0, RBI: 1, BB: 1, SO: 1 },
 ];
 
-const STAT_COLS = ['AB', 'R', 'H', 'RBI', 'BB', 'SO', 'AVG'];
+const STAT_COLS = ['AB', 'R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'AVG'];
 
 function calcAvg(h, ab) {
   if (ab === 0) return '.---';
@@ -49,17 +49,14 @@ function parseGameChangerCSV(text) {
   const rows = parseCSV(text);
   if (rows.length < 3) return null;
 
-  // Row 0 = category headers (Batting/Pitching/Fielding), Row 1 = column names
   const catRow = rows[0];
   const headers = rows[1];
 
-  // Find where batting columns end (before Pitching)
   let battingEnd = headers.length;
   for (let i = 0; i < catRow.length; i += 1) {
     if (catRow[i] === 'Pitching') { battingEnd = i; break; }
   }
 
-  // Build column index map for batting section
   const colIdx = {};
   for (let i = 0; i < battingEnd; i += 1) {
     if (headers[i] && !colIdx[headers[i]]) colIdx[headers[i]] = i;
@@ -86,6 +83,9 @@ function parseGameChangerCSV(text) {
       AB: getNum(row, 'AB'),
       R: getNum(row, 'R'),
       H: getNum(row, 'H'),
+      '2B': getNum(row, '2B'),
+      '3B': getNum(row, '3B'),
+      HR: getNum(row, 'HR'),
       RBI: getNum(row, 'RBI'),
       BB: getNum(row, 'BB'),
       SO: getNum(row, 'SO'),
@@ -106,6 +106,9 @@ function parseSimpleCSV(text) {
   const posIdx = find('Pos', 'pos', 'Position');
   const rIdx = find('R', 'r');
   const hIdx = find('H', 'h');
+  const dbIdx = find('2B');
+  const tbIdx = find('3B');
+  const hrIdx = find('HR', 'hr');
   const rbiIdx = find('RBI', 'rbi');
   const bbIdx = find('BB', 'bb');
   const soIdx = find('SO', 'so');
@@ -117,12 +120,12 @@ function parseSimpleCSV(text) {
       Player: r[playerIdx] || '',
       Pos: posIdx >= 0 ? r[posIdx] || '' : '',
       AB: col(r, abIdx), R: col(r, rIdx), H: col(r, hIdx),
+      '2B': col(r, dbIdx), '3B': col(r, tbIdx), HR: col(r, hrIdx),
       RBI: col(r, rbiIdx), BB: col(r, bbIdx), SO: col(r, soIdx),
     }));
 }
 
 async function fetchStats() {
-  // Try CSV first (GameChanger export or simple format)
   try {
     const resp = await fetch('/stats.csv');
     if (resp.ok) {
@@ -136,7 +139,6 @@ async function fetchStats() {
     }
   } catch { /* fall through */ }
 
-  // Try JSON (xlsx uploaded to DA)
   try {
     const resp = await fetch('/stats.json');
     if (!resp.ok) throw new Error(resp.status);
@@ -149,6 +151,9 @@ async function fetchStats() {
       AB: Number(r.AB || r.ab || 0),
       R: Number(r.R || r.r || 0),
       H: Number(r.H || r.h || 0),
+      '2B': Number(r['2B'] || 0),
+      '3B': Number(r['3B'] || 0),
+      HR: Number(r.HR || r.hr || 0),
       RBI: Number(r.RBI || r.rbi || 0),
       BB: Number(r.BB || r.bb || 0),
       SO: Number(r.SO || r.so || 0),
@@ -175,6 +180,9 @@ function buildCards(container, sorted) {
         <div class="stats-card-stat"><span class="stats-card-val">${p.AB}</span><span class="stats-card-label">AB</span></div>
         <div class="stats-card-stat"><span class="stats-card-val">${p.R}</span><span class="stats-card-label">R</span></div>
         <div class="stats-card-stat"><span class="stats-card-val ${p.H > 0 ? 'highlight' : ''}">${p.H}</span><span class="stats-card-label">H</span></div>
+        <div class="stats-card-stat"><span class="stats-card-val ${p['2B'] > 0 ? 'highlight' : ''}">${p['2B']}</span><span class="stats-card-label">2B</span></div>
+        <div class="stats-card-stat"><span class="stats-card-val ${p['3B'] > 0 ? 'highlight' : ''}">${p['3B']}</span><span class="stats-card-label">3B</span></div>
+        <div class="stats-card-stat"><span class="stats-card-val ${p.HR > 0 ? 'highlight' : ''}">${p.HR}</span><span class="stats-card-label">HR</span></div>
         <div class="stats-card-stat"><span class="stats-card-val ${p.RBI > 0 ? 'highlight' : ''}">${p.RBI}</span><span class="stats-card-label">RBI</span></div>
         <div class="stats-card-stat"><span class="stats-card-val">${p.BB}</span><span class="stats-card-label">BB</span></div>
         <div class="stats-card-stat"><span class="stats-card-val">${p.SO}</span><span class="stats-card-label">SO</span></div>
@@ -195,6 +203,9 @@ function buildTable(thead, tbody, sorted, statsData) {
       <td>${p.AB}</td>
       <td>${p.R}</td>
       <td class="${p.H > 0 ? 'highlight' : ''}">${p.H}</td>
+      <td class="${p['2B'] > 0 ? 'highlight' : ''}">${p['2B']}</td>
+      <td class="${p['3B'] > 0 ? 'highlight' : ''}">${p['3B']}</td>
+      <td class="${p.HR > 0 ? 'highlight' : ''}">${p.HR}</td>
       <td class="${p.RBI > 0 ? 'highlight' : ''}">${p.RBI}</td>
       <td>${p.BB}</td>
       <td>${p.SO}</td>
@@ -205,14 +216,16 @@ function buildTable(thead, tbody, sorted, statsData) {
 
   const totals = statsData.reduce((acc, p) => {
     acc.AB += p.AB; acc.R += p.R; acc.H += p.H;
+    acc['2B'] += p['2B']; acc['3B'] += p['3B']; acc.HR += p.HR;
     acc.RBI += p.RBI; acc.BB += p.BB; acc.SO += p.SO;
     return acc;
-  }, { AB: 0, R: 0, H: 0, RBI: 0, BB: 0, SO: 0 });
+  }, { AB: 0, R: 0, H: 0, '2B': 0, '3B': 0, HR: 0, RBI: 0, BB: 0, SO: 0 });
   const tr = document.createElement('tr');
   tr.className = 'totals-row';
   tr.innerHTML = `
     <td class="player-col">Team Totals</td>
     <td>${totals.AB}</td><td>${totals.R}</td><td>${totals.H}</td>
+    <td>${totals['2B']}</td><td>${totals['3B']}</td><td>${totals.HR}</td>
     <td>${totals.RBI}</td><td>${totals.BB}</td><td>${totals.SO}</td>
     <td class="avg-col">${calcAvg(totals.H, totals.AB)}</td>
   `;
@@ -226,27 +239,27 @@ export default async function decorate(block) {
   note.className = 'stats-note';
   note.textContent = 'Tap a column to sort. Stats from GameChanger.';
 
-  // Sort controls for mobile
   const sortBar = document.createElement('div');
   sortBar.className = 'stats-sort-bar';
   sortBar.innerHTML = `
     <label>Sort by</label>
     <select class="stats-sort-select">
-      <option value="7" selected>AVG</option>
+      <option value="10" selected>AVG</option>
       <option value="1">AB</option>
       <option value="2">R</option>
       <option value="3">H</option>
-      <option value="4">RBI</option>
-      <option value="5">BB</option>
-      <option value="6">SO</option>
+      <option value="4">2B</option>
+      <option value="5">3B</option>
+      <option value="6">HR</option>
+      <option value="7">RBI</option>
+      <option value="8">BB</option>
+      <option value="9">SO</option>
     </select>
   `;
 
-  // Mobile card view
   const cardView = document.createElement('div');
   cardView.className = 'stats-cards';
 
-  // Desktop table view
   const wrap = document.createElement('div');
   wrap.className = 'stats-table-wrap';
   const table = document.createElement('table');
@@ -274,15 +287,15 @@ export default async function decorate(block) {
   block.append(note, sortBar, cardView, wrap);
 
   const statsData = await fetchStats();
-  let sortCol = 7;
+  let sortCol = 10; // AVG
   let sortAsc = false;
 
   function getSorted() {
+    const keys = [null, 'AB', 'R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO'];
     return [...statsData].sort((a, b) => {
-      const keys = [null, 'AB', 'R', 'H', 'RBI', 'BB', 'SO'];
       let va;
       let vb;
-      if (sortCol === 7) {
+      if (sortCol === 10) {
         va = a.AB === 0 ? -1 : a.H / a.AB;
         vb = b.AB === 0 ? -1 : b.H / b.AB;
       } else {
