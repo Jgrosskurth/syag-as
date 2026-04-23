@@ -1,0 +1,140 @@
+/* ===== Filter bar ===== */
+.recaps .recaps-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.recaps .recaps-filter-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--gray-300);
+  border-radius: 20px;
+  background: var(--white);
+  font-family: var(--heading-font-family);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.recaps .recaps-filter-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.recaps .recaps-filter-btn.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+}
+
+/* ===== Recap cards ===== */
+.recaps .recaps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.recaps .recap-card {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.recaps .recap-header {
+  background: var(--green-dark);
+  color: var(--white);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.recaps .recap-game-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recaps .recap-game-num {
+  font-family: var(--heading-font-family);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.recaps .recap-date {
+  font-size: 13px;
+  color: rgb(255 255 255 / 60%);
+}
+
+.recaps .recap-matchup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recaps .recap-opponent {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.recaps .recap-result {
+  font-family: var(--heading-font-family);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 12px;
+  border-radius: 6px;
+}
+
+.recaps .recap-result.win {
+  background: rgb(255 255 255 / 15%);
+  color: var(--gold);
+}
+
+.recaps .recap-result.loss {
+  background: rgb(192 57 43 / 30%);
+  color: #f5a0a0;
+}
+
+.recaps .recap-body {
+  padding: 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--gray-800);
+}
+
+.recaps .recap-body p {
+  margin: 0 0 12px;
+}
+
+.recaps .recap-body p:last-child {
+  margin-bottom: 0;
+}
+
+@media (width < 600px) {
+  .recaps .recap-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .recaps .recap-body {
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .recaps .recaps-filter-btn {
+    font-size: 11px;
+    padding: 5px 12px;
+  }
+}

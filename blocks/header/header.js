@@ -33,6 +33,7 @@ export default async function decorate(block) {
       <a href="#schedule" class="nav-tab">Schedule</a>
       <a href="#stats" class="nav-tab">Stats</a>
       <a href="#livestream" class="nav-tab">Live</a>
+      <a href="#recaps" class="nav-tab">Recaps</a>
       <a href="#resources" class="nav-tab">Resources</a>
     </div>
   `;
