@@ -1,13 +1,21 @@
 function parseHeading(text) {
   // Format: "Game 1 — W 12-1 vs 905 Tedeschi Reds — Sat, Apr 18"
-  const match = text.match(/^Game\s+(\d+)\s*[—–-]\s*(W|L|T)\s+([\d]+-[\d]+)\s+vs\s+(.+?)\s*[—–-]\s*(.+)$/i);
-  if (!match) return null;
+  // Use em-dash (—) or en-dash (–) as delimiters (NOT regular hyphen which appears in team names)
+  const parts = text.split(/\s*[—–]\s*/);
+  if (parts.length < 3) return null;
+
+  const gameMatch = parts[0].match(/^Game\s+(\d+)$/i);
+  if (!gameMatch) return null;
+
+  const resultMatch = parts[1].match(/^(W|L|T)\s+([\d]+-[\d]+)\s+vs\s+(.+)$/i);
+  if (!resultMatch) return null;
+
   return {
-    game: Number(match[1]),
-    resultClass: match[2].toUpperCase() === 'W' ? 'win' : match[2].toUpperCase() === 'L' ? 'loss' : 'tie',
-    result: `${match[2].toUpperCase()} ${match[3]}`,
-    opponent: match[4].trim(),
-    date: match[5].trim(),
+    game: Number(gameMatch[1]),
+    resultClass: resultMatch[1].toUpperCase() === 'W' ? 'win' : resultMatch[1].toUpperCase() === 'L' ? 'loss' : 'tie',
+    result: `${resultMatch[1].toUpperCase()} ${resultMatch[2]}`,
+    opponent: resultMatch[3].trim(),
+    date: parts[2].trim(),
   };
 }
 
@@ -27,7 +35,7 @@ async function fetchRecaps() {
       if (!info) return;
 
       const paragraphs = [...section.querySelectorAll('p')];
-      info.summary = paragraphs.map((p) => p.innerHTML).join('');
+      info.summary = paragraphs.map((p) => `<p>${p.innerHTML}</p>`).join('');
       recaps.push(info);
     });
 
