@@ -223,7 +223,7 @@ function buildTable(thead, tbody, sorted, statsData) {
   const tr = document.createElement('tr');
   tr.className = 'totals-row';
   tr.innerHTML = `
-    <td class="player-col">Team Totals</td>
+    <td class="player-col">${typeof tFn === 'function' ? tFn('teamTotals') : 'Team Totals'}</td>
     <td>${totals.AB}</td><td>${totals.R}</td><td>${totals.H}</td>
     <td>${totals['2B']}</td><td>${totals['3B']}</td><td>${totals.HR}</td>
     <td>${totals.RBI}</td><td>${totals.BB}</td><td>${totals.SO}</td>
@@ -233,16 +233,18 @@ function buildTable(thead, tbody, sorted, statsData) {
 }
 
 export default async function decorate(block) {
+  let tFn;
+  try { const i18n = await import('../../scripts/i18n.js'); tFn = i18n.t; } catch { tFn = (k) => k; }
   block.textContent = '';
 
   const note = document.createElement('p');
   note.className = 'stats-note';
-  note.textContent = 'Tap a column to sort. Stats from GameChanger.';
+  note.textContent = tFn('statsTip');
 
   const sortBar = document.createElement('div');
   sortBar.className = 'stats-sort-bar';
   sortBar.innerHTML = `
-    <label>Sort by</label>
+    <label>${tFn('sortBy')}</label>
     <select class="stats-sort-select">
       <option value="10" selected>AVG</option>
       <option value="1">AB</option>

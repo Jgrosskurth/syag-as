@@ -1,3 +1,13 @@
+import { t } from '../../scripts/i18n.js';
+
+function translateHA(ha) {
+  const lower = ha.toLowerCase();
+  if (lower === 'home') return t('home');
+  if (lower === 'away') return t('away');
+  if (lower === 'bye') return t('bye');
+  return ha;
+}
+
 export default function decorate(block) {
   const rows = [...block.children];
   const track = document.createElement('div');
@@ -25,7 +35,7 @@ export default function decorate(block) {
       ${time ? `<div class="sched-time">${time}</div>` : ''}
       <div class="sched-opponent">${opponent}</div>
       <div class="sched-meta">
-        <span class="sched-badge ${haClass}">${ha}</span>
+        <span class="sched-badge ${haClass}">${translateHA(ha)}</span>
         <span class="sched-location">${location}</span>
       </div>
       ${hasResult ? `<div class="sched-result ${resultClass}">${result}</div>` : ''}

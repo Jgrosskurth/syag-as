@@ -1,6 +1,24 @@
+import { t } from '../../scripts/i18n.js';
+
 const GC_TEAM_ID = 'ytegAXE9ZttI';
 const GC_GAMES_API = `https://api.team-manager.gc.com/public/teams/${GC_TEAM_ID}/games/preview`;
 const GC_TEAM_URL = `https://web.gc.com/teams/${GC_TEAM_ID}`;
+
+function renderPlaceholder() {
+  return `
+    <div class="livestream-placeholder">
+      <div class="livestream-icon">📺</div>
+      <div class="livestream-message">
+        <div class="livestream-title">${t('liveTitle')}</div>
+        <p>${t('liveMsg1')}</p>
+        <p>${t('liveMsg2')}</p>
+      </div>
+      <a href="${GC_TEAM_URL}" target="_blank" rel="noopener" class="livestream-link">
+        ${t('openGC')}
+      </a>
+    </div>
+  `;
+}
 
 export default async function decorate(block) {
   block.textContent = '';
@@ -8,7 +26,6 @@ export default async function decorate(block) {
   const container = document.createElement('div');
   container.className = 'livestream-container';
 
-  // Check if any game has a live stream or is in progress
   let liveGame = null;
   try {
     const resp = await fetch(GC_GAMES_API);
@@ -16,7 +33,7 @@ export default async function decorate(block) {
       const games = await resp.json();
       liveGame = games.find((g) => g.has_live_stream || g.game_status === 'in_progress');
     }
-  } catch { /* CORS may block - fall through */ }
+  } catch { /* CORS may block */ }
 
   if (liveGame) {
     const iframe = document.createElement('iframe');
@@ -26,20 +43,12 @@ export default async function decorate(block) {
     iframe.className = 'livestream-iframe';
     container.append(iframe);
   } else {
-    container.innerHTML = `
-      <div class="livestream-placeholder">
-        <div class="livestream-icon">📺</div>
-        <div class="livestream-message">
-          <div class="livestream-title">Live Game Stream</div>
-          <p>When a game is live on GameChanger, the stream will appear here automatically.</p>
-          <p>Subscribe on the GameChanger app to enable live streaming for all games.</p>
-        </div>
-        <a href="${GC_TEAM_URL}" target="_blank" rel="noopener" class="livestream-link">
-          Open GameChanger →
-        </a>
-      </div>
-    `;
+    container.innerHTML = renderPlaceholder();
   }
 
   block.append(container);
+
+  document.addEventListener('lang-change', () => {
+    if (!liveGame) container.innerHTML = renderPlaceholder();
+  });
 }

@@ -1,14 +1,12 @@
+import { t } from '../../scripts/i18n.js';
+
 function parseHeading(text) {
-  // Format: "Game 1 — W 12-1 vs 905 Tedeschi Reds — Sat, Apr 18"
   const parts = text.split(/\s*[—–]\s*/);
   if (parts.length < 3) return null;
-
   const gameMatch = parts[0].match(/^Game\s+(\d+)$/i);
   if (!gameMatch) return null;
-
   const resultMatch = parts[1].match(/^(W|L|T)\s+([\d]+-[\d]+)\s+vs\s+(.+)$/i);
   if (!resultMatch) return null;
-
   return {
     game: Number(gameMatch[1]),
     resultClass: resultMatch[1].toUpperCase() === 'W' ? 'win' : resultMatch[1].toUpperCase() === 'L' ? 'loss' : 'tie',
@@ -21,13 +19,9 @@ function parseHeading(text) {
 }
 
 function buildTitle(info) {
-  if (info.wl === 'W') {
-    return `A's Take Down ${info.opponent} ${info.score}`;
-  }
-  if (info.wl === 'L') {
-    return `A's With Tough Game Against ${info.opponent}`;
-  }
-  return `A's Tie ${info.opponent} ${info.score}`;
+  if (info.wl === 'W') return `${t('winPrefix')} ${info.opponent} ${info.score}`;
+  if (info.wl === 'L') return `${t('lossPrefix')} ${info.opponent}`;
+  return `${t('tiePrefix')} ${info.opponent} ${info.score}`;
 }
 
 async function fetchRecaps() {
@@ -38,23 +32,18 @@ async function fetchRecaps() {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const sections = doc.querySelectorAll('div');
     const recaps = [];
-
     sections.forEach((section) => {
       const h2 = section.querySelector('h2');
       if (!h2) return;
       const info = parseHeading(h2.textContent.trim());
       if (!info) return;
-
       const paragraphs = [...section.querySelectorAll('p')];
       info.body = paragraphs.map((p) => `<p>${p.innerHTML}</p>`).join('');
       info.title = buildTitle(info);
       recaps.push(info);
     });
-
     return recaps.length > 0 ? recaps : null;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 export default async function decorate(block) {
@@ -62,28 +51,26 @@ export default async function decorate(block) {
 
   const recaps = await fetchRecaps();
   if (!recaps || recaps.length === 0) {
-    block.innerHTML = '<p class="recaps-empty">No game recaps yet. Check back after the next game!</p>';
+    block.innerHTML = `<p class="recaps-empty">${t('noRecaps')}</p>`;
     return;
   }
 
-  // Filter bar
   const filterBar = document.createElement('div');
   filterBar.className = 'recaps-filter';
   const allBtn = document.createElement('button');
   allBtn.className = 'recaps-filter-btn active';
-  allBtn.textContent = 'All Games';
+  allBtn.textContent = t('allGames');
   allBtn.dataset.game = 'all';
   filterBar.append(allBtn);
 
   recaps.forEach((r) => {
     const btn = document.createElement('button');
     btn.className = 'recaps-filter-btn';
-    btn.textContent = `Game ${r.game}`;
+    btn.textContent = `${t('game')} ${r.game}`;
     btn.dataset.game = r.game;
     filterBar.append(btn);
   });
 
-  // Recap articles
   const cardList = document.createElement('div');
   cardList.className = 'recaps-list';
 
@@ -91,11 +78,10 @@ export default async function decorate(block) {
     const card = document.createElement('article');
     card.className = 'recap-card';
     card.dataset.game = r.game;
-
     card.innerHTML = `
       <div class="recap-header">
         <h3 class="recap-title">${r.title}</h3>
-        <p class="recap-subtitle">${r.date} vs. ${r.opponent}</p>
+        <p class="recap-subtitle">${r.date} ${t('vs')}. ${r.opponent}</p>
         <span class="recap-badge ${r.resultClass}">${r.result}</span>
       </div>
       <div class="recap-body">${r.body}</div>
@@ -105,7 +91,6 @@ export default async function decorate(block) {
 
   block.append(filterBar, cardList);
 
-  // Filter logic
   filterBar.addEventListener('click', (e) => {
     const btn = e.target.closest('.recaps-filter-btn');
     if (!btn) return;
