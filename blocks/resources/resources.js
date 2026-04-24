@@ -1,3 +1,5 @@
+import { t } from '../../scripts/i18n.js';
+
 export default function decorate(block) {
   const rows = [...block.children];
   const grid = document.createElement('div');
@@ -19,7 +21,7 @@ export default function decorate(block) {
       <div class="resource-icon">${icon}</div>
       <div class="resource-title">${title}</div>
       <div class="resource-desc">${desc}</div>
-      <span class="resource-link">Visit →</span>
+      <span class="resource-link">${t('visitLink')}</span>
     `;
     grid.append(card);
   });

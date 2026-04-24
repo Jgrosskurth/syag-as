@@ -267,7 +267,7 @@ export default async function decorate(block) {
   const table = document.createElement('table');
   table.className = 'stats-table';
 
-  const cols = ['Player', ...STAT_COLS];
+  const cols = [tFn('player'), ...STAT_COLS];
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
   cols.forEach((col, i) => {
