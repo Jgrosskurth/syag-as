@@ -1,4 +1,4 @@
-import { t } from './i18n.js';
+import { t, getLang } from './i18n.js';
 
 // Update team record from schedule results
 (function updateRecord() {
@@ -42,7 +42,11 @@ function translateSectionHeadings() {
   document.querySelectorAll('main .default-content-wrapper h2').forEach((h2) => {
     const id = h2.id || h2.getAttribute('id');
     const key = HEADING_MAP[id];
-    if (key) h2.textContent = t(key);
+    if (key) {
+      const savedId = id;
+      h2.textContent = t(key);
+      h2.id = savedId;
+    }
   });
 }
 
@@ -53,13 +57,8 @@ function translateScheduleDesc() {
   if (!p) return;
   const link = p.querySelector('a');
   if (link) {
-    p.childNodes.forEach((node) => {
-      if (node.nodeType === 3 && node.textContent.trim().length > 5) {
-        node.textContent = `${t('scheduleDesc')} `;
-      }
-    });
-    const after = link.nextSibling;
-    if (after && after.nodeType === 3) after.textContent = '.';
+    const linkHTML = link.outerHTML;
+    p.innerHTML = `${t('scheduleDesc')} ${linkHTML}.`;
   }
 }
 
@@ -82,8 +81,10 @@ function translateAll() {
   translateResourceCards();
 }
 
-// Translate on load if not English
-translateAll();
+// Only translate on load if language is NOT English (English is the DA default)
+if (getLang() !== 'en') {
+  translateAll();
+}
 
 // Re-translate on language change
 document.addEventListener('lang-change', () => {
