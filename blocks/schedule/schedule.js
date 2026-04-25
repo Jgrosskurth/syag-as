@@ -24,20 +24,22 @@ export default function decorate(block) {
 
     const haLower = ha.toLowerCase();
     const haClass = haLower === 'home' ? 'home' : haLower === 'away' ? 'away' : 'bye';
-    const hasResult = result !== '—' && result !== '';
+    const isPostponed = result.toLowerCase().startsWith('ppd') || result.toLowerCase().startsWith('postponed');
+    const hasResult = !isPostponed && result !== '—' && result !== '';
     const isWin = result.startsWith('W');
     const resultClass = hasResult ? (isWin ? 'win' : 'loss') : '';
 
     const card = document.createElement('div');
-    card.className = `schedule-card ${haClass}${hasResult ? ` played ${resultClass}` : ''}`;
+    card.className = `schedule-card ${haClass}${hasResult ? ` played ${resultClass}` : ''}${isPostponed ? ' postponed' : ''}`;
     card.innerHTML = `
-      <div class="sched-date">${date}</div>
+      <div class="sched-date${isPostponed ? ' sched-date-ppd' : ''}">${date}</div>
       ${time ? `<div class="sched-time">${time}</div>` : ''}
       <div class="sched-opponent">${opponent}</div>
       <div class="sched-meta">
         <span class="sched-badge ${haClass}">${translateHA(ha)}</span>
         <span class="sched-location">${location}</span>
       </div>
+      ${isPostponed ? '<div class="sched-ppd">PPD — Rain</div>' : ''}
       ${hasResult ? `<div class="sched-result ${resultClass}">${result}</div>` : ''}
     `;
     track.append(card);
