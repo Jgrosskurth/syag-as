@@ -7,10 +7,10 @@ const WEATHER_API = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_L
 const WMO_CONDITIONS = {
   0: { label: 'Clear', icon: '☀️' },
   1: { label: 'Mostly Clear', icon: '🌤️' },
-  2: { label: 'Partly Cloudy', icon: '⛅' },
-  3: { label: 'Overcast', icon: '☁️' },
-  45: { label: 'Foggy', icon: '🌫️' },
-  48: { label: 'Icy Fog', icon: '🌫️' },
+  2: { label: 'Partly Cloudy', icon: '⛅', cloudy: true },
+  3: { label: 'Overcast', icon: '☁️', cloudy: true },
+  45: { label: 'Foggy', icon: '🌫️', cloudy: true },
+  48: { label: 'Icy Fog', icon: '🌫️', cloudy: true },
   51: { label: 'Light Drizzle', icon: '🌦️', rain: true },
   53: { label: 'Drizzle', icon: '🌦️', rain: true },
   55: { label: 'Heavy Drizzle', icon: '🌧️', rain: true },
@@ -47,6 +47,7 @@ async function fetchWeather() {
       label: info.label,
       icon: info.icon,
       isRain: !!info.rain,
+      isCloudy: !!info.cloudy || !!info.rain,
     };
   } catch { return null; }
 }
@@ -64,6 +65,24 @@ function createRaindrops() {
     drop.style.animationDuration = `${0.6 + Math.random() * 0.6}s`;
     drop.style.opacity = `${0.2 + Math.random() * 0.5}`;
     container.append(drop);
+  }
+  document.body.append(container);
+}
+
+function createClouds() {
+  if (document.getElementById('cloud-container')) return;
+  const container = document.createElement('div');
+  container.id = 'cloud-container';
+  container.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < 6; i += 1) {
+    const cloud = document.createElement('div');
+    cloud.className = 'cloud';
+    cloud.style.top = `${8 + Math.random() * 60}%`;
+    cloud.style.animationDuration = `${30 + Math.random() * 40}s`;
+    cloud.style.animationDelay = `${-Math.random() * 40}s`;
+    cloud.style.opacity = `${0.04 + Math.random() * 0.06}`;
+    cloud.style.transform = `scale(${0.6 + Math.random() * 0.8})`;
+    container.append(cloud);
   }
   document.body.append(container);
 }
@@ -147,6 +166,7 @@ export default async function decorate(block) {
       weather = w;
       refresh();
       if (w.isRain) createRaindrops();
+      if (w.isCloudy) createClouds();
     }
   });
 

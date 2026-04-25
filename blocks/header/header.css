@@ -195,6 +195,52 @@ header .nav-tab.active::after {
   100% { transform: translateY(100vh); }
 }
 
+/* CLOUDS */
+#cloud-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  overflow: hidden;
+}
+
+.cloud {
+  position: absolute;
+  left: -300px;
+  width: 300px;
+  height: 90px;
+  background: rgb(255 255 255 / 100%);
+  border-radius: 50px;
+  animation: cloud-drift linear infinite;
+}
+
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.cloud::before {
+  width: 130px;
+  height: 130px;
+  top: -50px;
+  left: 50px;
+}
+
+.cloud::after {
+  width: 90px;
+  height: 90px;
+  top: -30px;
+  right: 50px;
+}
+
+@keyframes cloud-drift {
+  0% { left: -400px; }
+  100% { left: calc(100vw + 100px); }
+}
+
 /* MOBILE */
 @media (width < 640px) {
   header .weather-widget {
