@@ -57,7 +57,8 @@ function createRaindrops() {
   const container = document.createElement('div');
   container.id = 'rain-container';
   container.setAttribute('aria-hidden', 'true');
-  for (let i = 0; i < 60; i += 1) {
+  const dropCount = window.innerWidth < 640 ? 30 : 60;
+  for (let i = 0; i < dropCount; i += 1) {
     const drop = document.createElement('div');
     drop.className = 'raindrop';
     drop.style.left = `${Math.random() * 100}%`;

@@ -188,6 +188,7 @@ header .nav-tab.active::after {
   background: linear-gradient(to bottom, transparent, rgb(174 194 224 / 60%));
   border-radius: 0 0 2px 2px;
   animation: rain-fall linear infinite;
+  will-change: transform;
 }
 
 @keyframes rain-fall {
@@ -212,6 +213,7 @@ header .nav-tab.active::after {
   background: rgb(255 255 255 / 100%);
   border-radius: 50px;
   animation: cloud-drift linear infinite;
+  will-change: transform, left;
 }
 
 .cloud::before,
@@ -262,5 +264,41 @@ header .nav-tab.active::after {
     width: 32px;
     height: 32px;
     font-size: 11px;
+  }
+
+  /* Smaller clouds on mobile */
+  .cloud {
+    width: 160px;
+    height: 48px;
+    left: -180px;
+    border-radius: 30px;
+  }
+
+  .cloud::before {
+    width: 70px;
+    height: 70px;
+    top: -28px;
+    left: 26px;
+  }
+
+  .cloud::after {
+    width: 48px;
+    height: 48px;
+    top: -16px;
+    right: 26px;
+  }
+
+  @keyframes cloud-drift {
+    0% { left: -220px; }
+    100% { left: calc(100vw + 60px); }
+  }
+}
+
+/* ACCESSIBILITY: disable weather effects for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .raindrop,
+  .cloud {
+    animation: none;
+    display: none;
   }
 }
