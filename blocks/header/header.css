@@ -1,4 +1,48 @@
 /* stylelint-disable no-descending-specificity */
+
+/* WEATHER WIDGET */
+header .weather-widget {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 20px;
+  background: rgb(0 0 0 / 25%);
+  font-size: 13px;
+  color: rgb(255 255 255 / 80%);
+  letter-spacing: 0.5px;
+}
+
+header .weather-widget.weather-loading {
+  font-size: 11px;
+  color: rgb(255 255 255 / 40%);
+  padding: 6px 20px;
+}
+
+header .weather-icon { font-size: 18px; }
+
+header .weather-temp {
+  font-family: var(--heading-font-family);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--white);
+}
+
+header .weather-label {
+  font-weight: 500;
+  color: var(--gold-light);
+}
+
+header .weather-wind {
+  font-size: 11px;
+  color: rgb(255 255 255 / 50%);
+}
+
+header .weather-wind::before {
+  content: '💨 ';
+}
+
+/* NAV WRAPPER */
 header .nav-wrapper {
   background: linear-gradient(135deg, var(--green-darker) 0%, var(--green) 50%, var(--green-dark) 100%);
   position: sticky;
@@ -114,7 +158,6 @@ header .nav-tab {
 }
 
 header .nav-tab:hover { color: rgb(255 255 255 / 80%); }
-
 header .nav-tab.active { color: var(--gold); }
 
 header .nav-tab.active::after {
@@ -128,8 +171,50 @@ header .nav-tab.active::after {
   border-radius: 3px 3px 0 0;
 }
 
+/* RAINDROPS */
+#rain-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.raindrop {
+  position: absolute;
+  top: -20px;
+  width: 2px;
+  height: 18px;
+  background: linear-gradient(to bottom, transparent, rgb(174 194 224 / 60%));
+  border-radius: 0 0 2px 2px;
+  animation: rain-fall linear infinite;
+}
+
+@keyframes rain-fall {
+  0% { transform: translateY(-20px); }
+  100% { transform: translateY(100vh); }
+}
+
+/* MOBILE */
 @media (width < 640px) {
+  header .weather-widget {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
+  header .weather-temp { font-size: 14px; }
+
   header .team-name { font-size: 22px; letter-spacing: 2px; }
   header .team-logo { width: 50px; height: 50px; font-size: 26px; }
   header .nav-tab { padding: 12px 12px; font-size: 12px; letter-spacing: 1px; }
+
+  header .lang-toggle {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
 }
