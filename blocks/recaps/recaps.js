@@ -1,12 +1,24 @@
-import { t, getLang, getRecapBody } from '../../scripts/i18n.js';
+import { t, getRecapBody } from '../../scripts/i18n.js';
 
 function parseHeading(text) {
-  const parts = text.split(/\s*[—–]\s*/);
+  // Flexible parsing: "Game N — W 12-1 vs Opponent — Date" or "Game N - W 12-1 vs Opponent - Date"
+  // Handles em dashes, en dashes, and regular hyphens as delimiters
+  // First try splitting on em/en dashes
+  let parts = text.split(/\s*[—–]\s*/);
+
+  // If that didn't produce 3 parts, try splitting on " - " (space-hyphen-space)
+  if (parts.length < 3) {
+    parts = text.split(/\s+-\s+/);
+  }
+
   if (parts.length < 3) return null;
+
   const gameMatch = parts[0].match(/^Game\s+(\d+)$/i);
   if (!gameMatch) return null;
+
   const resultMatch = parts[1].match(/^(W|L|T)\s+([\d]+-[\d]+)\s+vs\s+(.+)$/i);
   if (!resultMatch) return null;
+
   return {
     game: Number(gameMatch[1]),
     resultClass: resultMatch[1].toUpperCase() === 'W' ? 'win' : resultMatch[1].toUpperCase() === 'L' ? 'loss' : 'tie',
@@ -35,6 +47,7 @@ async function fetchRecaps() {
     sections.forEach((section) => {
       const h2 = section.querySelector('h2');
       if (!h2) return;
+      // Get text content (strips <strong> and other inline tags)
       const info = parseHeading(h2.textContent.trim());
       if (!info) return;
       const paragraphs = [...section.querySelectorAll('p')];
@@ -65,7 +78,7 @@ function renderRecaps(block, recaps, activeGame) {
   recaps.forEach((r) => {
     const btn = document.createElement('button');
     btn.className = `recaps-filter-btn${String(r.game) === String(activeGame) ? ' active' : ''}`;
-    btn.textContent = `${t('game')} ${r.game}`;
+    btn.textContent = r.date;
     btn.dataset.game = r.game;
     filterBar.append(btn);
   });
