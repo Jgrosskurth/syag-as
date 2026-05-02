@@ -113,6 +113,29 @@
   margin-bottom: 0;
 }
 
+/* ===== View All Button ===== */
+.recaps .recaps-view-all-btn {
+  display: block;
+  margin: 24px auto 0;
+  padding: 12px 32px;
+  background: var(--green);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.recaps .recaps-view-all-btn:hover {
+  background: var(--green-dark);
+  transform: translateY(-1px);
+}
+
 /* ===== Responsive ===== */
 @media (width < 600px) {
   .recaps .recap-card { padding: 20px; }

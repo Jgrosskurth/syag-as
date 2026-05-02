@@ -1,9 +1,6 @@
 import { t, getRecapBody } from '../../scripts/i18n.js';
 
 function parseHeading(text) {
-  // Match: "Game N [separator] W/L/T Score vs Opponent [separator] Date"
-  // Uses a single regex to avoid splitting on hyphens inside team names
-  // Date anchored by 3-letter weekday (Mon|Tue|Wed|Thu|Fri|Sat|Sun)
   const match = text.match(
     /^Game\s+(\d+)\s*[-—–]\s*(W|L|T)\s+(\d+-\d+)\s+vs\s+(.+?)\s*[-—–]\s*((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)[,\s].+)$/i,
   );
@@ -37,7 +34,6 @@ async function fetchRecaps() {
     sections.forEach((section) => {
       const h2 = section.querySelector('h2');
       if (!h2) return;
-      // Get text content (strips <strong> and other inline tags)
       const info = parseHeading(h2.textContent.trim());
       if (!info) return;
       const paragraphs = [...section.querySelectorAll('p')];
@@ -45,11 +41,15 @@ async function fetchRecaps() {
       info.title = buildTitle(info);
       recaps.push(info);
     });
+    // Sort by game number descending (latest game first)
+    recaps.sort((a, b) => b.game - a.game);
     return recaps.length > 0 ? recaps : null;
   } catch { return null; }
 }
 
-function renderRecaps(block, recaps, activeGame) {
+const INITIAL_SHOW = 2;
+
+function renderRecaps(block, recaps, showAll) {
   block.textContent = '';
 
   if (!recaps || recaps.length === 0) {
@@ -57,26 +57,10 @@ function renderRecaps(block, recaps, activeGame) {
     return;
   }
 
-  const filterBar = document.createElement('div');
-  filterBar.className = 'recaps-filter';
-  const allBtn = document.createElement('button');
-  allBtn.className = `recaps-filter-btn${activeGame === 'all' ? ' active' : ''}`;
-  allBtn.textContent = t('allGames');
-  allBtn.dataset.game = 'all';
-  filterBar.append(allBtn);
-
-  recaps.forEach((r) => {
-    const btn = document.createElement('button');
-    btn.className = `recaps-filter-btn${String(r.game) === String(activeGame) ? ' active' : ''}`;
-    btn.textContent = r.date;
-    btn.dataset.game = r.game;
-    filterBar.append(btn);
-  });
-
   const cardList = document.createElement('div');
   cardList.className = 'recaps-list';
 
-  recaps.forEach((r) => {
+  recaps.forEach((r, i) => {
     const title = buildTitle(r);
     const translatedBody = getRecapBody(r.game);
     const body = translatedBody || r.body;
@@ -84,7 +68,7 @@ function renderRecaps(block, recaps, activeGame) {
     const card = document.createElement('article');
     card.className = 'recap-card';
     card.dataset.game = r.game;
-    card.style.display = (activeGame === 'all' || String(r.game) === String(activeGame)) ? '' : 'none';
+    if (!showAll && i >= INITIAL_SHOW) card.style.display = 'none';
     card.innerHTML = `
       <div class="recap-header">
         <h3 class="recap-title">${title}</h3>
@@ -96,29 +80,29 @@ function renderRecaps(block, recaps, activeGame) {
     cardList.append(card);
   });
 
-  block.append(filterBar, cardList);
+  block.append(cardList);
 
-  filterBar.addEventListener('click', (e) => {
-    const btn = e.target.closest('.recaps-filter-btn');
-    if (!btn) return;
-    filterBar.querySelectorAll('.recaps-filter-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-    const game = btn.dataset.game;
-    cardList.querySelectorAll('.recap-card').forEach((card) => {
-      card.style.display = (game === 'all' || card.dataset.game === game) ? '' : 'none';
+  // Show "View All Recaps" button if there are more than INITIAL_SHOW
+  if (!showAll && recaps.length > INITIAL_SHOW) {
+    const viewAllBtn = document.createElement('button');
+    viewAllBtn.className = 'recaps-view-all-btn';
+    viewAllBtn.textContent = `${t('allGames')} (${recaps.length})`;
+    viewAllBtn.addEventListener('click', () => {
+      block.showAllRecaps = true;
+      renderRecaps(block, recaps, true);
     });
-    block.recapsActiveGame = game;
-  });
+    block.append(viewAllBtn);
+  }
 }
 
 export default async function decorate(block) {
   block.textContent = '';
-  block.recapsActiveGame = 'all';
+  block.showAllRecaps = false;
 
   const recaps = await fetchRecaps();
-  renderRecaps(block, recaps, 'all');
+  renderRecaps(block, recaps, false);
 
   document.addEventListener('lang-change', () => {
-    renderRecaps(block, recaps, block.recapsActiveGame || 'all');
+    renderRecaps(block, recaps, block.showAllRecaps || false);
   });
 }
