@@ -1,23 +1,33 @@
 import { t, getLang } from './i18n.js';
 
-// Update team record from schedule results
+// Update team record — try DOM first, then retry with polling
 (function updateRecord() {
   const record = document.querySelector('.team-record');
   if (!record) return;
-  const schedule = document.querySelector('.schedule');
-  if (!schedule) return;
-  let win = 0;
-  let loss = 0;
-  let tie = 0;
-  schedule.querySelectorAll('.sched-result').forEach((el) => {
-    const text = el.textContent.trim();
-    if (text.startsWith('W')) win += 1;
-    else if (text.startsWith('L')) loss += 1;
-    else if (text.startsWith('T')) tie += 1;
-  });
-  if (win > 0 || loss > 0 || tie > 0) {
-    record.textContent = tie > 0 ? `${win} - ${loss} - ${tie}` : `${win} - ${loss}`;
+
+  function computeFromDOM() {
+    let win = 0;
+    let loss = 0;
+    let tie = 0;
+    document.querySelectorAll('.sched-result').forEach((el) => {
+      const text = el.textContent.trim();
+      if (text.startsWith('W')) win += 1;
+      else if (text.startsWith('L')) loss += 1;
+      else if (text.startsWith('T')) tie += 1;
+    });
+    if (win > 0 || loss > 0 || tie > 0) {
+      record.textContent = tie > 0 ? `${win} - ${loss} - ${tie}` : `${win} - ${loss}`;
+      return true;
+    }
+    return false;
   }
+
+  // Poll until schedule renders (API-loaded blocks are async)
+  let attempts = 0;
+  const interval = setInterval(() => {
+    if (computeFromDOM() || attempts > 30) clearInterval(interval);
+    attempts += 1;
+  }, 500);
 }());
 
 // Section heading translation map (h2 id -> i18n key)

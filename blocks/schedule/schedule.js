@@ -1,5 +1,8 @@
 import { t } from '../../scripts/i18n.js';
 
+const GC_TEAM_ID = 'ytegAXE9ZttI';
+const GC_API = `https://api.team-manager.gc.com/public/teams/${GC_TEAM_ID}/games/preview`;
+
 function translateHA(ha) {
   const lower = ha.toLowerCase();
   if (lower === 'home') return t('home');
@@ -8,7 +11,52 @@ function translateHA(ha) {
   return ha;
 }
 
-export default function decorate(block) {
+function formatDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/New_York' });
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
+}
+
+function getResult(game) {
+  if (game.game_status !== 'completed' || !game.score) return '';
+  const teamScore = game.score.team;
+  const oppScore = game.score.opponent_team;
+  if (teamScore > oppScore) return `W ${teamScore}-${oppScore}`;
+  if (teamScore < oppScore) return `L ${teamScore}-${oppScore}`;
+  return `T ${teamScore}-${oppScore}`;
+}
+
+function renderCard(game) {
+  const date = formatDate(game.start_ts);
+  const time = game.game_status !== 'completed' ? formatTime(game.start_ts) : '';
+  const opponent = game.opponent_team.name;
+  const ha = game.home_away || '';
+  const haClass = ha === 'home' ? 'home' : ha === 'away' ? 'away' : 'bye';
+  const result = getResult(game);
+  const hasResult = result !== '';
+  const isWin = result.startsWith('W');
+  const isLoss = result.startsWith('L');
+  const resultClass = isWin ? 'win' : isLoss ? 'loss' : '';
+
+  const card = document.createElement('div');
+  card.className = `schedule-card ${haClass}${hasResult ? ` played ${resultClass}` : ''}`;
+  card.innerHTML = `
+    <div class="sched-date">${date}</div>
+    ${time ? `<div class="sched-time">${time}</div>` : ''}
+    <div class="sched-opponent">${opponent}</div>
+    <div class="sched-meta">
+      <span class="sched-badge ${haClass}">${translateHA(ha)}</span>
+    </div>
+    ${hasResult ? `<div class="sched-result ${resultClass}">${result}</div>` : ''}
+  `;
+  return card;
+}
+
+function renderFromDA(block) {
   const rows = [...block.children];
   const track = document.createElement('div');
   track.className = 'schedule-track';
@@ -47,4 +95,26 @@ export default function decorate(block) {
 
   block.textContent = '';
   block.append(track);
+}
+
+export default async function decorate(block) {
+  // Try fetching live schedule from GameChanger API
+  try {
+    const resp = await fetch(GC_API);
+    if (!resp.ok) throw new Error(resp.status);
+    const games = await resp.json();
+    if (!Array.isArray(games) || games.length === 0) throw new Error('empty');
+
+    block.textContent = '';
+    const track = document.createElement('div');
+    track.className = 'schedule-track';
+    games.forEach((game) => track.append(renderCard(game)));
+    block.append(track);
+    return;
+  } catch {
+    // CORS blocked or API error — fall back to DA content
+  }
+
+  // Fallback: render from DA-authored content
+  renderFromDA(block);
 }
