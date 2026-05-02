@@ -1,32 +1,22 @@
 import { t, getRecapBody } from '../../scripts/i18n.js';
 
 function parseHeading(text) {
-  // Flexible parsing: "Game N — W 12-1 vs Opponent — Date" or "Game N - W 12-1 vs Opponent - Date"
-  // Handles em dashes, en dashes, and regular hyphens as delimiters
-  // First try splitting on em/en dashes
-  let parts = text.split(/\s*[—–]\s*/);
-
-  // If that didn't produce 3 parts, try splitting on " - " (space-hyphen-space)
-  if (parts.length < 3) {
-    parts = text.split(/\s+-\s+/);
-  }
-
-  if (parts.length < 3) return null;
-
-  const gameMatch = parts[0].match(/^Game\s+(\d+)$/i);
-  if (!gameMatch) return null;
-
-  const resultMatch = parts[1].match(/^(W|L|T)\s+([\d]+-[\d]+)\s+vs\s+(.+)$/i);
-  if (!resultMatch) return null;
+  // Match: "Game N [separator] W/L/T Score vs Opponent [separator] Date"
+  // Uses a single regex to avoid splitting on hyphens inside team names
+  // Date anchored by 3-letter weekday (Mon|Tue|Wed|Thu|Fri|Sat|Sun)
+  const match = text.match(
+    /^Game\s+(\d+)\s*[-—–]\s*(W|L|T)\s+(\d+-\d+)\s+vs\s+(.+?)\s*[-—–]\s*((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)[,\s].+)$/i,
+  );
+  if (!match) return null;
 
   return {
-    game: Number(gameMatch[1]),
-    resultClass: resultMatch[1].toUpperCase() === 'W' ? 'win' : resultMatch[1].toUpperCase() === 'L' ? 'loss' : 'tie',
-    result: `${resultMatch[1].toUpperCase()} ${resultMatch[2]}`,
-    score: resultMatch[2],
-    wl: resultMatch[1].toUpperCase(),
-    opponent: resultMatch[3].trim(),
-    date: parts[2].trim(),
+    game: Number(match[1]),
+    resultClass: match[2].toUpperCase() === 'W' ? 'win' : match[2].toUpperCase() === 'L' ? 'loss' : 'tie',
+    result: `${match[2].toUpperCase()} ${match[3]}`,
+    score: match[3],
+    wl: match[2].toUpperCase(),
+    opponent: match[4].trim(),
+    date: match[5].trim(),
   };
 }
 
