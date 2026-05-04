@@ -133,6 +133,7 @@ function buildNav(weather) {
       <a href="#stats" class="nav-tab">${t('stats')}</a>
       <a href="#livestream" class="nav-tab">${t('live')}</a>
       <a href="#recaps" class="nav-tab">${t('recaps')}</a>
+      <a href="#sponsors" class="nav-tab">${t('sponsors')}</a>
       <a href="#resources" class="nav-tab">${t('resources')}</a>
     </div>
   `;

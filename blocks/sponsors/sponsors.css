@@ -1,0 +1,200 @@
+.sponsors .sponsors-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sponsors .sponsors-intro {
+  text-align: center;
+  font-size: 16px;
+  color: var(--gray-600);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+/* Tiers */
+.sponsors .sponsor-tiers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.sponsors .sponsor-tier {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sponsors .sponsor-tier:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.sponsors .sponsor-tier-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 3px solid;
+}
+
+.sponsors .sponsor-tier-icon {
+  font-size: 28px;
+}
+
+.sponsors .sponsor-tier-name {
+  font-family: var(--heading-font-family);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green-dark);
+  margin: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+  display: inline;
+}
+
+.sponsors .sponsor-tier-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sponsors .sponsor-tier-benefits li {
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--gray-800);
+  border-bottom: 1px solid var(--gray-200);
+  padding-left: 20px;
+  position: relative;
+}
+
+.sponsors .sponsor-tier-benefits li:last-child {
+  border-bottom: none;
+}
+
+.sponsors .sponsor-tier-benefits li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* Platinum special styling */
+.sponsors .sponsor-tier-platinum {
+  border: 2px solid #e5e4e2;
+  background: linear-gradient(135deg, var(--white) 0%, #f8f7f5 100%);
+}
+
+/* Form */
+.sponsors .sponsor-form-wrap {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 32px;
+}
+
+.sponsors .sponsor-form-title {
+  font-family: var(--heading-font-family);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green-dark);
+  margin: 0 0 8px;
+  border-bottom: none;
+  padding-bottom: 0;
+  display: block;
+}
+
+.sponsors .sponsor-form-desc {
+  font-size: 14px;
+  color: var(--gray-600);
+  margin-bottom: 20px;
+}
+
+.sponsors .sponsor-form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sponsors .sponsor-form input,
+.sponsors .sponsor-form select,
+.sponsors .sponsor-form textarea {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  color: var(--gray-800);
+  background: var(--gray-100);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sponsors .sponsor-form input:focus,
+.sponsors .sponsor-form select:focus,
+.sponsors .sponsor-form textarea:focus {
+  border-color: var(--green);
+}
+
+.sponsors .sponsor-form textarea {
+  width: 100%;
+  resize: vertical;
+  margin-bottom: 16px;
+}
+
+.sponsors .sponsor-submit {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--green);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sponsors .sponsor-submit:hover {
+  background: var(--green-dark);
+}
+
+.sponsors .sponsor-form-success {
+  text-align: center;
+  padding: 24px;
+}
+
+.sponsors .sponsor-success-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.sponsors .sponsor-form-success p {
+  font-size: 16px;
+  color: var(--green-dark);
+  font-weight: 500;
+}
+
+@media (width < 600px) {
+  .sponsors .sponsor-form-row {
+    flex-direction: column;
+  }
+
+  .sponsors .sponsor-form-wrap {
+    padding: 20px;
+  }
+}

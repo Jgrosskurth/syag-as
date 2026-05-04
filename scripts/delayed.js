@@ -37,6 +37,7 @@ const HEADING_MAP = {
   'player-stats': 'h-player-stats',
   livestream: 'h-livestream',
   'game-recaps': 'h-game-recaps',
+  sponsors: 'h-sponsors',
   'team-resources': 'h-team-resources',
 };
 
