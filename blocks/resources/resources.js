@@ -1,5 +1,19 @@
 import { t } from '../../scripts/i18n.js';
 
+const RESOURCE_ICONS = {
+  syag: '⚾',
+  gamechanger: '📱',
+  groupme: '💬',
+  rules: '📖',
+  rule: '📖',
+};
+
+function getIcon(title) {
+  const lower = title.toLowerCase();
+  const match = Object.keys(RESOURCE_ICONS).find((key) => lower.includes(key));
+  return match ? RESOURCE_ICONS[match] : '🔗';
+}
+
 export default function decorate(block) {
   const rows = [...block.children];
   const grid = document.createElement('div');
@@ -7,10 +21,9 @@ export default function decorate(block) {
 
   rows.forEach((row) => {
     const cells = [...row.children];
-    let icon; let title; let desc; let link; let linkText;
+    let title; let desc; let link; let linkText;
 
     if (cells.length >= 4) {
-      icon = cells[0]?.textContent?.trim() || '🔗';
       title = cells[1]?.textContent?.trim() || '';
       desc = cells[2]?.textContent?.trim() || '';
       const linkEl = cells[3]?.querySelector('a');
@@ -22,8 +35,9 @@ export default function decorate(block) {
       const linkEl = cells[2]?.querySelector('a');
       link = linkEl?.href || '#';
       linkText = linkEl?.textContent?.trim() || t('visitLink');
-      icon = '🔗';
     }
+
+    const icon = getIcon(title);
 
     const card = document.createElement('a');
     card.className = 'resource-card';
