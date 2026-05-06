@@ -159,6 +159,34 @@
   text-align: center;
 }
 
+/* LAST GAME */
+.schedule .last-game-card {
+  position: relative;
+}
+
+.schedule .last-game-label {
+  display: block;
+  font-family: var(--heading-font-family);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--green);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  width: fit-content;
+  margin-left: auto;
+}
+
+.schedule .schedule-divider {
+  flex: 0 0 2px;
+  align-self: stretch;
+  background: linear-gradient(to bottom, transparent, var(--gray-300), transparent);
+  margin: 0 4px;
+}
+
 @media (width < 600px) {
   .schedule .schedule-card {
     flex: 0 0 170px;

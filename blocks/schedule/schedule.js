@@ -56,49 +56,97 @@ function renderCard(game) {
   return card;
 }
 
+function buildDACard(cells) {
+  const date = cells[0]?.textContent?.trim() || '';
+  const time = cells[1]?.textContent?.trim() || '';
+  const opponent = cells[2]?.textContent?.trim() || '';
+  const location = cells[3]?.textContent?.trim() || '';
+  const ha = cells[4]?.textContent?.trim() || '';
+  const result = cells[5]?.textContent?.trim() || '—';
+
+  const haLower = ha.toLowerCase();
+  const haClass = haLower === 'home' ? 'home' : haLower === 'away' ? 'away' : 'bye';
+  const isPostponed = result.toLowerCase().startsWith('ppd') || result.toLowerCase().startsWith('postponed');
+  const hasResult = !isPostponed && result !== '—' && result !== '';
+  const isWin = result.startsWith('W');
+  const resultClass = hasResult ? (isWin ? 'win' : 'loss') : '';
+
+  const card = document.createElement('div');
+  card.className = `schedule-card ${haClass}${hasResult ? ` played ${resultClass}` : ''}${isPostponed ? ' postponed' : ''}`;
+  card.innerHTML = `
+    <div class="sched-date${isPostponed ? ' sched-date-ppd' : ''}">${date}</div>
+    ${time ? `<div class="sched-time">${time}</div>` : ''}
+    <div class="sched-opponent">${opponent}</div>
+    <div class="sched-meta">
+      <span class="sched-badge ${haClass}">${translateHA(ha)}</span>
+      <span class="sched-location">${location}</span>
+    </div>
+    ${isPostponed ? '<div class="sched-ppd">PPD – Rain</div>' : ''}
+    ${hasResult ? `<div class="sched-result ${resultClass}">${result}</div>` : ''}
+  `;
+
+  return { card, hasResult, isPostponed };
+}
+
+function parseGameDate(dateStr) {
+  const cleaned = dateStr.replace(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s*/i, '');
+  const withYear = `${cleaned}, 2026`;
+  const parsed = new Date(withYear);
+  if (!Number.isNaN(parsed.getTime())) return parsed;
+  return null;
+}
+
 function renderFromDA(block) {
   const rows = [...block.children];
+  const cards = rows.map((row) => {
+    const cells = [...row.children];
+    const dateStr = cells[0]?.textContent?.trim() || '';
+    return { cells, dateStr, ...buildDACard(cells) };
+  });
+
+  // Find the most recent game that has already been played (date <= today)
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  let lastGameIndex = -1;
+  for (let i = cards.length - 1; i >= 0; i -= 1) {
+    const gameDate = parseGameDate(cards[i].dateStr);
+    if (gameDate && gameDate <= today) {
+      lastGameIndex = i;
+      break;
+    }
+  }
+
+  block.textContent = '';
+
   const track = document.createElement('div');
   track.className = 'schedule-track';
 
-  rows.forEach((row) => {
-    const cells = [...row.children];
-    const date = cells[0]?.textContent?.trim() || '';
-    const time = cells[1]?.textContent?.trim() || '';
-    const opponent = cells[2]?.textContent?.trim() || '';
-    const location = cells[3]?.textContent?.trim() || '';
-    const ha = cells[4]?.textContent?.trim() || '';
-    const result = cells[5]?.textContent?.trim() || 'â';
+  if (lastGameIndex >= 0) {
+    const lastCard = cards[lastGameIndex].card;
+    lastCard.classList.add('last-game-card');
 
-    const haLower = ha.toLowerCase();
-    const haClass = haLower === 'home' ? 'home' : haLower === 'away' ? 'away' : 'bye';
-    const isPostponed = result.toLowerCase().startsWith('ppd') || result.toLowerCase().startsWith('postponed');
-    const hasResult = !isPostponed && result !== 'â' && result !== '';
-    const isWin = result.startsWith('W');
-    const resultClass = hasResult ? (isWin ? 'win' : 'loss') : '';
+    const label = document.createElement('span');
+    label.className = 'last-game-label';
+    label.textContent = t('lastGame') || 'LAST GAME';
+    lastCard.prepend(label);
 
-    const card = document.createElement('div');
-    card.className = `schedule-card ${haClass}${hasResult ? ` played ${resultClass}` : ''}${isPostponed ? ' postponed' : ''}`;
-    card.innerHTML = `
-      <div class="sched-date${isPostponed ? ' sched-date-ppd' : ''}">${date}</div>
-      ${time ? `<div class="sched-time">${time}</div>` : ''}
-      <div class="sched-opponent">${opponent}</div>
-      <div class="sched-meta">
-        <span class="sched-badge ${haClass}">${translateHA(ha)}</span>
-        <span class="sched-location">${location}</span>
-      </div>
-      ${isPostponed ? '<div class="sched-ppd">PPD â Rain</div>' : ''}
-      ${hasResult ? `<div class="sched-result ${resultClass}">${result}</div>` : ''}
-    `;
-    track.append(card);
-  });
+    track.append(lastCard);
 
-  block.textContent = '';
+    const divider = document.createElement('div');
+    divider.className = 'schedule-divider';
+    track.append(divider);
+
+    cards.forEach(({ card }, i) => {
+      if (i !== lastGameIndex) track.append(card);
+    });
+  } else {
+    cards.forEach(({ card }) => track.append(card));
+  }
+
   block.append(track);
 }
 
 export default async function decorate(block) {
-  // Try fetching live schedule from GameChanger API
   try {
     const resp = await fetch(GC_API);
     if (!resp.ok) throw new Error(resp.status);
@@ -112,10 +160,8 @@ export default async function decorate(block) {
     block.append(track);
     return;
   } catch {
-    // CORS blocked or API error â fall back to DA content
+    // CORS blocked or API error - fall back to DA content
   }
 
-  // Fallback: render from DA-authored content
   renderFromDA(block);
 }
-
