@@ -44,6 +44,8 @@ function renderCard(game) {
 
   const card = document.createElement('div');
   card.className = `schedule-card ${haClass}${hasResult ? ` played ${resultClass}` : ''}`;
+  card.dataset.startTs = game.start_ts;
+  card.dataset.completed = game.game_status === 'completed' ? 'true' : 'false';
   card.innerHTML = `
     <div class="sched-date">${date}</div>
     ${time ? `<div class="sched-time">${time}</div>` : ''}
@@ -54,6 +56,22 @@ function renderCard(game) {
     ${hasResult ? `<div class="sched-result ${resultClass}">${result}</div>` : ''}
   `;
   return card;
+}
+
+/**
+ * Find the last completed game card in the track and sticky it to the front
+ * with a highlighted "LAST GAME" treatment.
+ */
+function stickyLastGame(track) {
+  const cards = [...track.querySelectorAll('.schedule-card.played')];
+  if (cards.length === 0) return;
+  const lastGameCard = cards[cards.length - 1];
+  lastGameCard.classList.add('last-game');
+  const label = document.createElement('div');
+  label.className = 'sched-last-game-label';
+  label.textContent = 'LAST GAME';
+  lastGameCard.prepend(label);
+  track.prepend(lastGameCard);
 }
 
 function renderFromDA(block) {
@@ -68,12 +86,12 @@ function renderFromDA(block) {
     const opponent = cells[2]?.textContent?.trim() || '';
     const location = cells[3]?.textContent?.trim() || '';
     const ha = cells[4]?.textContent?.trim() || '';
-    const result = cells[5]?.textContent?.trim() || '—';
+    const result = cells[5]?.textContent?.trim() || '\u2014';
 
     const haLower = ha.toLowerCase();
     const haClass = haLower === 'home' ? 'home' : haLower === 'away' ? 'away' : 'bye';
     const isPostponed = result.toLowerCase().startsWith('ppd') || result.toLowerCase().startsWith('postponed');
-    const hasResult = !isPostponed && result !== '—' && result !== '';
+    const hasResult = !isPostponed && result !== '\u2014' && result !== '';
     const isWin = result.startsWith('W');
     const resultClass = hasResult ? (isWin ? 'win' : 'loss') : '';
 
@@ -87,7 +105,7 @@ function renderFromDA(block) {
         <span class="sched-badge ${haClass}">${translateHA(ha)}</span>
         <span class="sched-location">${location}</span>
       </div>
-      ${isPostponed ? '<div class="sched-ppd">PPD — Rain</div>' : ''}
+      ${isPostponed ? '<div class="sched-ppd">PPD \u2014 Rain</div>' : ''}
       ${hasResult ? `<div class="sched-result ${resultClass}">${result}</div>` : ''}
     `;
     track.append(card);
@@ -95,10 +113,10 @@ function renderFromDA(block) {
 
   block.textContent = '';
   block.append(track);
+  stickyLastGame(track);
 }
 
 export default async function decorate(block) {
-  // Try fetching live schedule from GameChanger API
   try {
     const resp = await fetch(GC_API);
     if (!resp.ok) throw new Error(resp.status);
@@ -110,11 +128,12 @@ export default async function decorate(block) {
     track.className = 'schedule-track';
     games.forEach((game) => track.append(renderCard(game)));
     block.append(track);
+    stickyLastGame(track);
     return;
   } catch {
-    // CORS blocked or API error — fall back to DA content
+    // CORS blocked or API error, fall back to DA content
   }
 
-  // Fallback: render from DA-authored content
   renderFromDA(block);
 }
+
