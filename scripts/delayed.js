@@ -1,5 +1,64 @@
 import { t, getLang } from './i18n.js';
 
+// PWA: Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
+// PWA: Install banner (mobile only, dismissible with cookie)
+(function initPWABanner() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone;
+  if (isStandalone) return;
+  if (document.cookie.includes('pwa-banner-dismissed=1')) return;
+  if (window.innerWidth > 768) return;
+
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  const banner = document.createElement('div');
+  banner.className = 'pwa-install-banner';
+  banner.innerHTML = `
+    <div class="pwa-banner-content">
+      <div class="pwa-banner-logo">A's</div>
+      <button class="pwa-banner-install">Install App</button>
+      <button class="pwa-banner-close" aria-label="Close">&times;</button>
+    </div>
+  `;
+
+  const header = document.querySelector('header');
+  if (header) {
+    header.prepend(banner);
+  } else {
+    document.body.prepend(banner);
+  }
+
+  function dismiss() {
+    banner.remove();
+    document.cookie = 'pwa-banner-dismissed=1; path=/; max-age=2592000; SameSite=Lax';
+  }
+
+  banner.querySelector('.pwa-banner-close').addEventListener('click', dismiss);
+
+  banner.querySelector('.pwa-banner-install').addEventListener('click', () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+      dismiss();
+    } else {
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const msg = isIOS
+        ? 'Tap the Share button, then "Add to Home Screen"'
+        : 'Tap the menu (⋮) then "Add to Home Screen"';
+      alert(msg);
+      dismiss();
+    }
+  });
+}());
+
 // Update team record — try DOM first, then retry with polling
 (function updateRecord() {
   const record = document.querySelector('.team-record');

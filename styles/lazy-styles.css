@@ -1,1 +1,70 @@
 /* Lazy loaded styles */
+
+/* PWA Install Banner */
+.pwa-install-banner {
+  background: var(--green-darker);
+  border-bottom: 2px solid var(--gold);
+}
+
+.pwa-banner-content {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  gap: 12px;
+}
+
+.pwa-banner-logo {
+  width: 36px;
+  height: 36px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--heading-font-family);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--green-darker);
+  flex-shrink: 0;
+  border: 2px solid var(--gold-light);
+}
+
+.pwa-banner-install {
+  margin-left: auto;
+  padding: 6px 16px;
+  background: var(--gold);
+  color: var(--green-darker);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.pwa-banner-install:hover {
+  background: var(--gold-light);
+}
+
+.pwa-banner-close {
+  background: none;
+  border: none;
+  color: rgb(255 255 255 / 60%);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+
+.pwa-banner-close:hover {
+  color: var(--white);
+}
+
+@media (width >= 769px) {
+  .pwa-install-banner {
+    display: none;
+  }
+}
