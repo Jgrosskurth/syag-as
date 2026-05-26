@@ -22,7 +22,7 @@ const TRANSLATIONS = {
     noRecaps: 'No game recaps yet. Check back after the next game!',
     footerLine1: "SYAG A's",
     footerLine2: '2026 Season · Sachem Youth Advisory Group',
-    lastGame: 'LAST GAME',
+    lastGame: 'LATEST GAME',
     home: 'Home',
     away: 'Away',
     bye: 'Bye',
